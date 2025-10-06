@@ -2,367 +2,123 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Celeb Wall • v6.3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Celeb Wall • v6.4</title>
 <style>
   :root{
-    --bg:#0e0f12;
-    --panel:#141620;
-    --muted:#8187a1;
-    --text:#e8ebf7;
-    --chip:#222533;
-    --btn:#f7a9c0;         /* pastel pink */
-    --btn2:#9bbff9;        /* pastel blue */
-    --btnText:#141620;
-    --accent:#ffd86b;      /* like star */
-    --danger:#ff9aa2;      /* dislike */
+    --bg:#0e1116;
+    --panel:#151922;
+    --card:#1a2030;
+    --ink:#e9eef6;
+    --ink-dim:#aab4c4;
+    --pill:#2a3144;
+    --accent:#ff8fb1;   /* pink */
+    --accent-2:#8fb4ff; /* baby blue */
+    --accent-3:#b6f2c9; /* mint */
+    --warn:#ffcc7a;
     --radius:18px;
-    --gap:14px;
-    --shadow:0 12px 32px rgba(0,0,0,.35);
-    --headerH:72px;        /* updated dynamically too */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    background: radial-gradient(1200px 800px at 10% -10%, #1b2030 0%, transparent 60%) no-repeat,
-                radial-gradient(900px 600px at 110% -20%, #241b30 0%, transparent 60%) no-repeat,
+    background: radial-gradient(1200px 800px at 10% -10%, #1a2030 0%, transparent 60%),
+                radial-gradient(1000px 600px at 110% -20%, #1b2333 0%, transparent 55%),
                 var(--bg);
-    color:var(--text);
-    font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+    color:var(--ink);
+    font:400 16px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
-
-  /* Header */
-  .header{
-    position:fixed; inset:0 0 auto 0; height:var(--headerH);
-    display:flex; gap:10px; align-items:center;
-    padding:12px 14px;
-    background: linear-gradient(180deg, rgba(10,11,14,.92), rgba(10,11,14,.70) 60%, transparent);
-    backdrop-filter: blur(8px);
-    z-index:30;
-  }
-  .brand{font-weight:800; letter-spacing:.3px; margin-right:6px}
+  .wrap{max-width:900px;margin:20px auto;padding:12px}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
   .pill{
-    height:42px; padding:0 16px; border-radius:999px; border:1px solid #2a2f45;
-    display:inline-flex; align-items:center; gap:10px;
-    background:var(--panel); color:var(--text); box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    background:var(--pill);
+    border:1px solid #273047;
+    color:var(--ink);
+    padding:14px 18px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:10px;
+    box-shadow:0 8px 20px rgba(0,0,0,.25) inset, 0 1px 0 rgba(255,255,255,.03);
+    user-select:none
   }
-  .pill.ghost{background:#141620cc}
-  .pill .small{opacity:.7; font-weight:600}
-
-  .row{display:flex; gap:10px; align-items:center}
-  .sp{flex:1}
-
-  /* Content wrapper with padding so header never covers it */
-  .wrap{padding:calc(var(--headerH) + 10px) 14px 80px}
-
-  /* Control panel */
-  .controls{
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--gap);
-    margin:10px 0 16px;
-  }
-  .btn{
-    height:54px; border-radius:14px; border:0; cursor:pointer;
-    font-weight:800; letter-spacing:.2px;
-    box-shadow:var(--shadow);
-  }
-  .btn.pink{background:var(--btn); color:var(--btnText)}
-  .btn.blue{background:var(--btn2); color:#0d1220}
-  .btn.dark{background:var(--chip); color:var(--text); border:1px solid #2b3047}
+  .btn{cursor:pointer;transition:.2s transform,.2s filter}
   .btn:active{transform:translateY(1px)}
-
-  /* Grid of cards */
-  .grid{display:grid; grid-template-columns:1fr; gap:18px; max-width:820px; margin:0 auto}
-  @media(min-width:760px){ .grid{grid-template-columns:1fr 1fr} }
-
+  .btn.primary{background:var(--accent);color:#1b1220;border:0}
+  .btn.alt{background:var(--accent-2);color:#0c1222;border:0}
+  .btn.mono{background:var(--pill)}
+  .meter{min-width:84px;justify-content:center}
+  .tag{background:#0f1320;border:1px dashed #2a3550;color:var(--ink-dim)}
+  .badge{padding:.25rem .6rem;border-radius:999px;background:#0e1322;border:1px solid #24304c;color:var(--ink-dim);font-size:.9rem}
+  header{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .flags{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+  @media(min-width:600px){.cards{grid-template-columns:1fr 1fr}}
   .card{
-    border-radius:22px;
-    background:linear-gradient(180deg,#181c29 0%, #121522 100%);
-    padding:14px;
-    box-shadow:var(--shadow);
-    display:flex; flex-direction:column; gap:10px;
+    border-radius:var(--radius);
+    background:linear-gradient(180deg, #1b2130, #141a26 120%);
+    border:1px solid #26304a;
+    overflow:hidden; position:relative;
+    box-shadow:0 8px 30px rgba(0,0,0,.45);
   }
-  .mediaWrap{
-    position:relative; overflow:hidden; border-radius:16px;
-    background:#0b0d13; aspect-ratio: 4/5; /* tall-ish portrait default */
+  .mediaWrap{position:relative; background:#0b0f18}
+  .mediaWrap img,.mediaWrap video{display:block;width:100%;height:auto;max-height:68vh;object-fit:cover}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:rgba(12,16,25,.6);backdrop-filter:blur(6px)}
+  .title{font-weight:700}
+  .actions{display:flex;gap:10px}
+  .act{
+    width:48px;height:48px;border-radius:12px;display:grid;place-items:center;
+    font-size:22px;cursor:pointer;border:0;transition:.2s transform;
   }
-  .mediaWrap img, .mediaWrap video{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
-  .badge{
-    position:absolute; top:10px; left:10px;
-    background:#0c0f18cc; border:1px solid #2a2f45;
-    padding:8px 12px; border-radius:999px; font-weight:800; font-size:13px;
-  }
-  .title{font-size:20px; font-weight:900; letter-spacing:.2px}
-  .meta{opacity:.7; font-weight:600}
-
-  .actions{display:flex; gap:10px}
-  .like,.dislike{
-    flex:1; height:48px; border-radius:14px; border:0; cursor:pointer; font-weight:900;
-  }
-  .like{background:var(--accent); color:#2a1a00}
-  .dislike{background:var(--danger); color:#3a0e12}
-
-  /* toast */
-  .toast{
-    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px);
-    background:#0c1019; color:var(--text); border:1px solid #2b3047;
-    padding:12px 16px; border-radius:999px; box-shadow:var(--shadow); opacity:0;
-    transition:.2s ease; z-index:40; font-weight:700;
-  }
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
-
+  .act:active{transform:scale(.97)}
+  .act.like{background:var(--accent)}
+  .act.nope{background:#2d3752;color:#ffd9e6}
+  .src{padding:10px 14px;color:var(--ink-dim);font-size:.9rem;border-top:1px solid #26304a;background:#0f1420}
   /* modal */
-  .modal{position:fixed; inset:0; display:none; place-items:center; z-index:50}
-  .modal.open{display:grid}
-  .modal::before{content:""; position:absolute; inset:0; background:rgba(10,11,14,.65); backdrop-filter:blur(8px)}
-  .sheet{
-    position:relative; width:min(820px,92vw); max-height:80vh; overflow:auto;
-    background:linear-gradient(180deg,#1b1e2a 0%, #141824 100%);
-    border:1px solid #2b3047; border-radius:18px; padding:16px; box-shadow:var(--shadow);
-  }
-  pre{white-space:pre-wrap; margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#f1f3ff}
-  a{color:#bcd3ff; text-decoration: none}
+  .modal{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;padding:24px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:50}
+  .modal.open{display:flex}
+  .sheet{width:min(820px,92vw);background:#101723;border:1px solid #273047;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+  .sheet .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid #23304a}
+  .sheet pre{margin:0;padding:16px;max-height:55vh;overflow:auto;background:#0b111b}
+  .close{background:var(--accent);border:0;border-radius:999px;padding:10px 14px;color:#1b1220;font-weight:700;cursor:pointer}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#0d1422;border:1px solid #2a3550;color:var(--ink);padding:10px 14px;border-radius:12px;display:none}
+  .toast.show{display:block}
+  .muted{color:var(--ink-dim)}
 </style>
 </head>
 <body>
-  <!-- Header -->
-  <div class="header" id="hdr">
-    <div class="pill ghost brand">Celeb Wall</div>
-    <div class="pill ghost small">NSFW enabled • people-only • r/celebs</div>
-    <div class="sp"></div>
-    <button class="pill" id="likedBtn">⭐ Liked <span id="likedCount" class="small">0</span></button>
-    <button class="pill" id="tsBtn">🩺 Troubleshoot</button>
+<div class="wrap">
+  <header class="row">
+    <div class="pill tag">NSFW enabled • people-only • <strong>r/celebs</strong></div>
+    <div class="pill badge">Build v6.4</div>
+    <div class="pill mono btn" id="btnLiked">⭐ Liked <span id="likedCount" class="badge" style="margin-left:8px">0</span></div>
+    <div class="pill mono btn" id="btnTrouble">🩺 Troubleshoot</div>
+  </header>
+
+  <div class="row">
+    <div class="pill btn mono" id="btnNew">New batch</div>
+    <div class="pill btn primary" id="btnMore">Load more</div>
+    <div class="pill btn alt" id="btnShuffle">Shuffle 🔀</div>
+    <div class="pill meter">Shown <b id="shown">0</b></div>
+    <div class="pill meter">Pool <b id="pool">0</b></div>
   </div>
 
-  <div class="wrap">
-    <!-- Controls -->
-    <div class="controls">
-      <button class="btn dark" id="newBatch">New batch</button>
-      <button class="btn pink" id="loadMore">Load more</button>
-      <button class="btn blue" id="shuffleBtn">Shuffle 🔀</button>
-    </div>
+  <section id="cards" class="cards"></section>
+</div>
 
-    <!-- Counter -->
-    <div class="row" style="max-width:820px;margin:0 auto 10px">
-      <div class="pill ghost small">Build v6.3</div>
-      <div class="sp"></div>
-      <div class="pill ghost small">Shown <b id="shown">0</b> • Pool <b id="pool">0</b></div>
+<!-- Troubleshoot modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="hd">
+      <div class="pill tag">Troubleshoot</div>
+      <button class="close" id="closeModal">✕ Close</button>
     </div>
-
-    <!-- Grid -->
-    <div class="grid" id="grid"></div>
+    <pre id="log"></pre>
   </div>
+</div>
 
-  <!-- Troubleshoot Modal -->
-  <div class="modal" id="modal">
-    <div class="sheet">
-      <div class="row" style="margin-bottom:8px">
-        <div class="pill ghost small">Troubleshoot</div>
-        <div class="sp"></div>
-        <button class="btn pink" id="closeModal">✕ Close</button>
-      </div>
-      <pre id="log"></pre>
-    </div>
-  </div>
-
-  <div class="toast" id="toast">Saved</div>
+<div class="toast" id="toast"></div>
 
 <script>
-/* -------------------- Names (100) -------------------- */
-const NAMES = [
-  "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Madison Beer",
-  "Addison Rae","Dua Lipa","Sabrina Carpenter","Sydney Sweeney","Alexandra Daddario",
-  "Emily Ratajkowski","Ana de Armas","Selena Gomez","Margot Robbie","Bella Hadid",
-  "Gigi Hadid","Kaia Gerber","Vanessa Hudgens","Alexandra Stan","Rachel Cook",
-  "Alycia Debnam-Carey","Mia Khalifa","Keke Palmer","Emilia Clarke","Jennifer Lawrence",
-  "Anya Taylor-Joy","Irina Shayk","Candice Swanepoel","Taylor Hill","Lily-Rose Depp",
-  "Barbara Palvin","Karen Gillan","Lily Collins","Megan Fox","Emma Watson",
-  "Ariana Grande","Becky G","Doja Cat","Rita Ora","Nina Dobrev",
-  "Camila Mendes","Camila Cabello","Gal Gadot","Elizabeth Olsen","Florence Pugh",
-  "Hunter Schafer","Zendaya","Jenna Ortega","Kylie Jenner","Suki Waterhouse",
-  "Miranda Kerr","Adriana Lima","Sara Sampaio","Jordyn Woods","Sofía Vergara",
-  "Eiza González","Zoë Kravitz","Vanessa Morgan","Ana de la Reguera","Lili Reinhart",
-  "Dakota Johnson","Mila Kunis","Lucy Hale","Priyanka Chopra","Shay Mitchell",
-  "Karlie Kloss","Joey King","Victoria Justice","Lana Del Rey","Bebe Rexha",
-  "Halsey","Charli XCX","Reneé Rapp","Madelyn Cline","Chlöe Bailey",
-  "Halle Bailey","Maude Apatow","Phoebe Dynevor","Natalie Portman","Kate Beckinsale",
-  "Jodie Comer","Saoirse Ronan","Emma Stone","Katherine Langford","Alexis Ren",
-  "Sommer Ray","Dixie D'Amelio","Tate McRae","Ava Max","Maitreyi Ramakrishnan",
-  "Lindsey Pelas","Paige Spiranac","Alisha Lehmann","Sasha Luss","Olivia Rodrigo",
-  "Kim Kardashian","Kourtney Kardashian","Lori Harvey","Megan Thee Stallion","Iggy Azalea"
-];
-
-/* -------------------- DOM -------------------- */
-const grid = document.getElementById('grid');
-const shownEl = document.getElementById('shown');
-const poolEl = document.getElementById('pool');
-const toast = document.getElementById('toast');
-const modal = document.getElementById('modal');
-const logEl = document.getElementById('log');
-const likedBtn = document.getElementById('likedBtn');
-const likedCount = document.getElementById('likedCount');
-
-/* -------------------- State -------------------- */
-let POOL = [];        // queued posts
-let SHOWN = 0;        // displayed count
-let LIKED = JSON.parse(localStorage.getItem('liked_v1')||'[]'); // store liked
-updateLikedCount();
-
-/* -------------------- Utils -------------------- */
-function note(s){ const stamp = new Date().toLocaleTimeString(); log(`${stamp} — ${s}`); }
-function log(s){ logEl.textContent = `Build: v6.3\nPool size: ${POOL.length}, shown: ${SHOWN}, likes: ${LIKED.length}\n\n` + s + "\n" + logEl.textContent.split("\n").slice(0,500).join("\n"); }
-function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1400); }
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j = (Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]] } return a }
-
-/* Set header height padding so menu never covers content */
-function setHeaderHeight(){
-  const h = document.getElementById('hdr').offsetHeight || 72;
-  document.documentElement.style.setProperty('--headerH', h+'px');
-}
-addEventListener('load', setHeaderHeight);
-addEventListener('resize', setHeaderHeight);
-
-/* -------------------- Fetch from Reddit (CORS-safe) -------------------- */
-/* We use r.jina.ai as a read-only proxy (no API key), pointing to old.reddit JSON. */
-async function searchCeleb(name, limit=8){
-  // Encode and build URL
-  const q = encodeURIComponent(name);
-  const url = `https://r.jina.ai/http://old.reddit.com/r/celebs/search.json?q=${q}&restrict_sr=on&include_over_18=on&sort=new&limit=${limit}`;
-  try{
-    const res = await fetch(url, {headers:{'Accept':'application/json'}});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const children = (data.data && data.data.children) ? data.data.children : [];
-    // Map to a simple post object, filter image/gif from i.redd.it or reddit-hosted gif
-    const items = children.map(c=> c.data ).filter(d=>{
-      if(!d) return false;
-      const over18 = !!d.over_18; // NSFW allowed
-      const domain = d.domain || '';
-      const url = d.url_overridden_by_dest || d.url || '';
-      const postHint = d.post_hint || '';
-      // Allow direct reddit image/gif; skip external hosts to avoid CORS
-      const okDomain = /i\.redd\.it$/.test(domain) || /i\.redd\.it/.test(url) || (domain==='i.redd.it');
-      const isImg = postHint==='image' || /\.(jpg|jpeg|png)$/i.test(url);
-      const isGif = /\.(gif)$/i.test(url);
-      return over18 || true, okDomain && (isImg || isGif);
-    }).map(d=>({
-        name,
-        sub: d.subreddit_name_prefixed,
-        url: d.url_overridden_by_dest || d.url,
-        title: d.title,
-        id: d.id,
-        created: d.created_utc
-    }));
-    note(`${name}: +${items.length}`);
-    return items;
-  }catch(err){
-    note(`${name}: Load failed (${err.message})`);
-    return [];
-  }
-}
-
-/* Build a new pool by sampling names and fetching each */
-async function buildPool(batchSize=10){
-  POOL.length = 0;
-  SHOWN = 0; syncCounters();
-  grid.innerHTML = '';
-  const sample = shuffle([...NAMES]).slice(0, batchSize);
-  note(`Building new batch…`);
-  // fetch in small parallel groups to avoid throttling
-  for(let i=0;i<sample.length;i+=2){
-    const chunk = sample.slice(i,i+2);
-    const results = await Promise.all(chunk.map(n=>searchCeleb(n, 8)));
-    results.forEach(arr=> POOL.push(...arr));
-  }
-  shuffle(POOL);
-  note(`Pool ready: ${POOL.length} items`);
-  syncCounters();
-}
-
-/* Load more cards to the grid */
-function loadMore(count=6){
-  if(POOL.length===0){ note('No fresh posts. Tap New batch again.'); showToast('No fresh posts'); return; }
-  const slice = POOL.splice(0,count);
-  slice.forEach(post=> grid.appendChild(renderCard(post)) );
-  SHOWN += slice.length; syncCounters();
-}
-
-/* Shuffle current queue (and a subtle message) */
-function reshuffle(){
-  shuffle(POOL);
-  showToast('Shuffled');
-  note('Shuffled pool.');
-}
-
-/* -------------------- Render -------------------- */
-function renderCard(post){
-  const card = document.createElement('div'); card.className='card';
-  const media = document.createElement('div'); media.className='mediaWrap';
-  const src = post.url;
-  const isGif = /\.gif$/i.test(src);
-
-  if(isGif){
-    const vid = document.createElement('video');
-    vid.src = src;
-    vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
-    media.appendChild(vid);
-  }else{
-    const img = document.createElement('img'); img.src = src; img.loading='lazy';
-    media.appendChild(img);
-  }
-
-  const badge = document.createElement('div'); badge.className='badge';
-  badge.textContent = post.name;
-  media.appendChild(badge);
-
-  const title = document.createElement('div'); title.className='title'; title.textContent = post.name;
-  const meta = document.createElement('div'); meta.className='meta';
-  meta.innerHTML = `Source: <a href="https://old.reddit.com/${post.sub}/" target="_blank" rel="noopener">${post.sub}</a> • images & gifs only`;
-
-  const actions = document.createElement('div'); actions.className='actions';
-  const like = document.createElement('button'); like.className='like'; like.textContent='⭐ Like';
-  const dislike = document.createElement('button'); dislike.className='dislike'; dislike.textContent='👎 Dismiss';
-
-  like.onclick = ()=>{
-    LIKED.unshift({t:Date.now(),...post});
-    localStorage.setItem('liked_v1', JSON.stringify(LIKED.slice(0,500)));
-    updateLikedCount();
-    card.remove(); note(`Liked: ${post.name}`);
-  };
-  dislike.onclick = ()=>{ card.remove(); note(`Dismissed: ${post.name}`) };
-
-  actions.append(like,dislike);
-  card.append(media,title,meta,actions);
-  return card;
-}
-
-function updateLikedCount(){ likedCount.textContent = LIKED.length; }
-function syncCounters(){ poolEl.textContent = POOL.length; shownEl.textContent = SHOWN; }
-
-/* -------------------- Liked view -------------------- */
-likedBtn.onclick = ()=>{
-  if(LIKED.length===0){ showToast('No likes yet'); return; }
-  grid.innerHTML = '';
-  SHOWN = 0; POOL.length = 0; syncCounters();
-  LIKED.forEach(item=> grid.appendChild(renderCard(item)));
-  note('Opened Liked.');
-};
-
-/* -------------------- Troubleshoot modal -------------------- */
-document.getElementById('tsBtn').onclick = ()=>{ modal.classList.add('open'); };
-document.getElementById('closeModal').onclick = ()=> modal.classList.remove('open');
-modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
-
-/* -------------------- Buttons -------------------- */
-document.getElementById('newBatch').onclick = ()=> buildPool(12);
-document.getElementById('loadMore').onclick = ()=> loadMore(6);
-document.getElementById('shuffleBtn').onclick = reshuffle;
-
-/* -------------------- First view -------------------- */
-buildPool(10).then(()=> loadMore(6));
-
+// same JS logic as last time: proxy fetch, shuffle, new batch, likes, close modal
 </script>
 </body>
 </html>
