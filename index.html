@@ -3,121 +3,71 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Celeb Wall — v6.3.2</title>
+<title>Celeb Wall — v6.3.3</title>
 <style>
   :root{
-    --bg:#0f1115;
-    --bg2:#12151b;
-    --card:#161a22;
-    --text:#e9edf1;
-    --muted:#a9b3c1;
-    --pill:#222836;
-    --pillEdge:#2b3344;
-    --pink:#ff9cb3;
-    --blue:#8bb6ff;
-    --yellow:#ffd76a;
-    --red:#ff8b8b;
-    --shadow: 0 10px 28px rgba(0,0,0,.35);
-    --r:14px;
+    --bg:#0f1115; --bg2:#12151b; --card:#161a22;
+    --text:#e9edf1; --muted:#a9b3c1;
+    --pill:#222836; --pillEdge:#2b3344;
+    --pink:#ff9cb3; --blue:#8bb6ff; --yellow:#ffd76a;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    background: radial-gradient(1200px 600px at 50% -200px, #1a202c 0%, #0f1115 60%), var(--bg);
-    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.4;
-  }
-
-  /* Top control bar */
-  header{position:sticky; top:0; z-index:5; backdrop-filter:saturate(120%) blur(6px);}
-  .bar{
-    display:flex; flex-wrap:wrap; gap:.75rem; align-items:center;
-    padding:16px clamp(14px, 4vw, 28px);
-    background: linear-gradient(180deg, rgba(18,21,27,.82), rgba(18,21,27,.55) 70%, rgba(18,21,27,0));
-    border-bottom:1px solid #1f2430;
-  }
-  .pill{display:inline-flex; align-items:center; gap:.6rem; padding:.7rem 1rem; border-radius:999px; background:var(--pill); border:1px solid var(--pillEdge); color:var(--text)}
-  .btn{cursor:pointer; user-select:none; transition:.15s transform, .15s filter}
-  .btn:active{transform:translateY(1px)}
-  .mono{font-weight:700; letter-spacing:.2px}
-  .primary{background:var(--pink); color:#1d2129; border-color:#f59bb0}
-  .alt{background:var(--blue); color:#0f141c; border-color:#a0c5ff}
-  .chip{background:#1a2130; color:var(--muted)}
-  .tag{background:#1a1f2a; color:#cfd6df}
-
-  /* Metrics group */
-  .row{display:flex; flex-wrap:wrap; gap:.75rem; align-items:center}
-
-  /* Cards */
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,#1a202c 0%,#0f1115 60%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  header{position:sticky;top:0;z-index:5;backdrop-filter:saturate(120%) blur(6px)}
+  .bar{display:flex;flex-wrap:wrap;gap:.75rem;padding:16px clamp(14px,4vw,28px);background:linear-gradient(180deg,rgba(18,21,27,.82),rgba(18,21,27,.55) 70%,rgba(18,21,27,0));border-bottom:1px solid #1f2430}
+  .row{display:flex;flex-wrap:wrap;gap:.75rem}
+  .pill{display:inline-flex;align-items:center;gap:.6rem;padding:.7rem 1rem;border-radius:999px;background:#222836;border:1px solid #2b3344}
+  .btn{cursor:pointer;user-select:none}
+  .primary{background:var(--pink);color:#1d2129;border-color:#f59bb0}
+  .alt{background:var(--blue);color:#0f141c;border-color:#a0c5ff}
+  .chip{background:#1a2130;color:var(--muted)}
   main{padding:10px clamp(12px,4vw,28px) 64px}
-  .cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px}
-  .card{
-    background:var(--card); border:1px solid #1f2430; border-radius:18px; box-shadow:var(--shadow); overflow:hidden;
-    display:flex; flex-direction:column; min-height:260px;
-  }
-  .frame{position:relative; aspect-ratio: 4/5; background:#0c0f14; display:grid; place-items:center}
-  .frame img, .frame video{width:100%; height:100%; object-fit:cover; display:block}
-  .meta{display:flex; gap:.6rem; align-items:center; justify-content:space-between; padding:10px 12px; border-top:1px solid #1f2430; background:linear-gradient(180deg, #151925, #141821)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+  .card{background:var(--card);border:1px solid #1f2430;border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.35);overflow:hidden;display:flex;flex-direction:column;min-height:260px}
+  .frame{position:relative;aspect-ratio:4/5;background:#0c0f14;display:grid;place-items:center}
+  .frame img,.frame video{width:100%;height:100%;object-fit:cover;display:block}
+  .meta{display:flex;justify-content:space-between;gap:.6rem;padding:10px 12px;border-top:1px solid #1f2430;background:linear-gradient(180deg,#151925,#141821)}
   .title{font-weight:700}
-  .source{font-size:.85rem; color:var(--muted)}
-  .actions{display:flex; gap:.5rem}
-  .iconbtn{
-    width:42px; height:42px; border-radius:12px; border:1px solid #263047; background:#1b2232; display:grid; place-items:center; cursor:pointer;
-  }
-  .iconbtn.fav{background:var(--yellow); border-color:#ffdf7e; color:#2b1f00}
-  .iconbtn.bad{background:#2a1920; border-color:#3a202a; color:#ffb1b1}
-
-  /* Modal */
-  .modal{position:fixed; inset:0; display:none; place-items:center; padding:24px; z-index:6; }
-  .modal.open{display:grid; background:rgba(6,8,12,.52)}
-  .sheet{width:min(800px, 92vw); background:var(--card); border:1px solid #242a36; border-radius:18px; box-shadow:var(--shadow)}
-  .hd{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #232a38}
-  .close{background:var(--pink); color:#1e2129; border:1px solid #f3a0b5; border-radius:999px; padding:.55rem 1rem; font-weight:700; cursor:pointer}
-  pre{margin:0; padding:16px; max-height:60vh; overflow:auto; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; color:#d7dde6; background:#12161f}
-
-  /* Toast */
-  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#151b25; border:1px solid #253049; color:#e6ecf3; padding:.7rem 1rem; border-radius:12px; display:none; z-index:7}
+  .source{font-size:.85rem;color:var(--muted)}
+  .actions{display:flex;gap:.5rem}
+  .iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid #263047;background:#1b2232;display:grid;place-items:center;cursor:pointer}
+  .fav{background:var(--yellow);border-color:#ffdf7e;color:#2b1f00}
+  .bad{background:#2a1920;border-color:#3a202a;color:#ffb1b1}
+  .modal{position:fixed;inset:0;display:none;place-items:center;padding:24px;z-index:6}
+  .modal.open{display:grid;background:rgba(6,8,12,.52)}
+  .sheet{width:min(800px,92vw);background:#161a22;border:1px solid #242a36;border-radius:18px}
+  .hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #232a38}
+  .close{background:var(--pink);color:#1e2129;border:1px solid #f3a0b5;border-radius:999px;padding:.55rem 1rem;font-weight:700;cursor:pointer}
+  pre{margin:0;padding:16px;max-height:60vh;overflow:auto;font-family:ui-monospace,Menlo,Consolas,monospace;color:#d7dde6;background:#12161f}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#151b25;border:1px solid #253049;color:#e6ecf3;padding:.7rem 1rem;border-radius:12px;display:none;z-index:7}
   .toast.show{display:block}
-
-  /* Small helpers */
-  .sp{opacity:.55}
-  .badge{background:#1a2130; border:1px solid #27314a; padding:.4rem .7rem; border-radius:999px}
 </style>
 </head>
 <body>
-
 <header>
   <div class="bar">
     <div class="row">
-      <div class="pill btn mono" id="btnHome">Celeb Wall</div>
+      <div class="pill btn" id="btnHome">Celeb Wall</div>
       <div class="pill btn primary" id="btnNew">New batch</div>
     </div>
-
     <div class="row">
       <div class="pill btn alt" id="btnLoad">Load more</div>
       <div class="pill btn alt" id="btnShuffle">Shuffle</div>
-      <div class="pill chip">Build v6.3.2</div>
+      <div class="pill chip">Build v6.3.3</div>
     </div>
-
     <div class="row">
       <div class="pill chip">Shown <b id="shown">0</b></div>
       <div class="pill chip">Pool <b id="pool">0</b></div>
-      <div class="pill btn tag" id="btnTrouble">Troubleshoot</div>
+      <div class="pill btn" id="btnTrouble">Troubleshoot</div>
     </div>
   </div>
 </header>
 
-<main>
-  <section id="cards" class="cards"></section>
-</main>
+<main><section id="cards" class="cards"></section></main>
 
-<!-- Troubleshoot modal -->
 <div class="modal" id="modal">
   <div class="sheet">
-    <div class="hd">
-      <div class="pill tag">Troubleshoot</div>
-      <button class="close" id="closeModal">Close</button>
-    </div>
+    <div class="hd"><div class="pill">Troubleshoot</div><button class="close" id="closeModal">Close</button></div>
     <pre id="log"></pre>
   </div>
 </div>
@@ -125,9 +75,7 @@
 <div class="toast" id="toast">Saved.</div>
 
 <script>
-/* ---------------------------
-   State
----------------------------- */
+/* ------- state ------- */
 const cardsEl = document.getElementById('cards');
 const shownEl = document.getElementById('shown');
 const poolEl  = document.getElementById('pool');
@@ -135,71 +83,89 @@ const logEl   = document.getElementById('log');
 const modal   = document.getElementById('modal');
 const toast   = document.getElementById('toast');
 
-let pool = [];        // available items (unrendered)
-let shown = 0;        // rendered count (increment as we attach)
-const BATCH_PICK = 8; // how many to add per "Load more"
+let pool = [];
+let shown = 0;
+const BATCH_PICK = 8;
+
 const PEOPLE = [
-  // front-loaded few you asked for, then a broader set
   "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Madison Beer",
   "Sabrina Carpenter","Sydney Sweeney","Dua Lipa","Gal Gadot","Alexandra Daddario",
-  "Ana de Armas","Taylor Swift","Selena Gomez","Kaia Gerber","Vanessa Hudgens",
-  "Margot Robbie","Emily Ratajkowski","Irina Shayk","Emma Watson","Ariana Grande"
+  "Ana de Armas","Selena Gomez","Kaia Gerber","Vanessa Hudgens","Margot Robbie",
+  "Emily Ratajkowski","Irina Shayk","Emma Watson","Ariana Grande","Bella Hadid"
 ];
 
-/* ---------------------------
-   Logging / modal
----------------------------- */
-function log(msg){
-  const t = new Date().toLocaleTimeString();
-  logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
-}
-document.getElementById('btnTrouble').onclick = ()=> modal.classList.add('open');
-document.getElementById('closeModal').onclick = ()=> modal.classList.remove('open');
-modal.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
-
-/* ---------------------------
-   Utility
----------------------------- */
+/* ------- helpers ------- */
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 function shuffleArray(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 function updateMeters(){ shownEl.textContent = shown; poolEl.textContent = pool.length; }
-function toastShow(text='Saved.'){ toast.textContent=text; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1200); }
+function log(m){ const t=new Date().toLocaleTimeString(); logEl.textContent = `[${t}] ${m}\n` + logEl.textContent; }
+function toastShow(msg){ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1100); }
+document.getElementById('btnTrouble').onclick = ()=> modal.classList.add('open');
+document.getElementById('closeModal').onclick = ()=> modal.classList.remove('open');
+modal.addEventListener('click', e=>{ if(e.target===modal) modal.classList.remove('open'); });
 
-/* ---------------------------
-   Media helpers
----------------------------- */
-function normalizeUrl(raw, rv){
-  if (!raw && !rv) return null;
-  // direct images / gifs
-  if (raw && /\.(jpg|jpeg|png|gif|webp)$/i.test(raw)) return raw;
-  if (raw && /\.gifv$/i.test(raw)) return raw.replace(/\.gifv$/i,'.mp4');
-  // reddit native video
-  if (rv && (rv.fallback_url || rv.hls_url)) return rv.fallback_url || rv.hls_url;
+/* ------- URL normalizer (expanded) ------- */
+function clean(u){ return typeof u==='string' ? u.replace(/&amp;/g,'&') : u; }
+function toMP4(u){
+  if(!u) return null;
+  if(/\.gifv($|\?)/i.test(u)) return u.replace(/\.gifv/i, '.mp4');
+  if(/imgur\.com\/(?!a\/)([^.]+)($|\/$)/.test(u)) return `${u.replace(/\/$/,'')}.jpg`;
+  return u;
+}
+function pickRedditVideo(d){
+  const rv = d?.secure_media?.reddit_video || d?.media?.reddit_video;
+  if (rv?.fallback_url) return rv.fallback_url;
+  const cp = d?.crosspost_parent_list?.[0];
+  const rv2 = cp?.secure_media?.reddit_video || cp?.media?.reddit_video;
+  return rv2?.fallback_url || null;
+}
+function extractGallery(d){
+  if(!d?.is_gallery || !d?.media_metadata) return [];
+  const out=[];
+  for(const k of Object.keys(d.media_metadata)){
+    const m = d.media_metadata[k];
+    const s = m?.s;
+    const u = clean(s?.u || s?.gif || s?.mp4);
+    if(u) out.push({url: toMP4(u)});
+  }
+  return out;
+}
+function extractPreview(d){
+  const p = d?.preview?.images?.[0]?.source?.url;
+  return p ? clean(p) : null;
+}
+function bestUrl(d){
+  const direct = clean(d?.url_overridden_by_dest || d?.url);
+  const vid = pickRedditVideo(d);
+  if(vid) return { url: vid, kind:'video' };
+  const gallery = extractGallery(d);
+  if(gallery.length) return { url: gallery[0].url, kind: /\.mp4$/.test(gallery[0].url)?'video':'image' };
+  let u = toMP4(direct);
+  if(u && /\.(jpg|jpeg|png|gif|webp|mp4)$/i.test(u)) return { url:u, kind: /\.mp4$/i.test(u)?'video':'image' };
+  const prev = extractPreview(d);
+  if(prev) return { url: toMP4(prev), kind:'image' };
   return null;
 }
 
-/* ---------------------------
-   Reddit loader (surgical + robust)
----------------------------- */
-async function fetchCelebMedia(name, limit=25){
-  const url = `https://www.reddit.com/r/celebs/search.json?restrict_sr=1&sort=new&limit=${limit}&q=${encodeURIComponent(name)}`;
+/* ------- Reddit loader (now covers: direct, preview, video, crosspost, gallery) ------- */
+async function fetchCelebMedia(name, limit=35){
+  const url = `https://www.reddit.com/r/celebs/search.json?restrict_sr=1&sort=new&limit=${limit}&q=title:${encodeURIComponent(name)}&include_over_18=on&raw_json=1`;
   try{
     const res = await fetch(url, {headers:{'Accept':'application/json'}});
     if(!res.ok){ log(`${name}: HTTP ${res.status}`); return 0; }
     const data = await res.json();
-    const children = data?.data?.children ?? [];
+    const kids = data?.data?.children || [];
     let added = 0;
 
-    for(const c of children){
-      const d  = c?.data ?? {};
-      const rv = d?.secure_media?.reddit_video ?? null;
-      const finalUrl = normalizeUrl(d.url_overridden_by_dest || d.url, rv);
-      if(!finalUrl) continue;
+    for(const c of kids){
+      const d = c?.data || {};
+      const pick = bestUrl(d);
+      if(!pick || !pick.url) continue;
 
       pool.push({
-        title: d.title || name,
-        url: finalUrl,
-        kind: finalUrl.endsWith('.mp4') || finalUrl.includes('.mp4') || finalUrl.includes('m3u8') ? 'video' : 'image',
+        title: (d.title || name).replace(/\s*\(.*?\)\s*/,''),
+        url: pick.url,
+        kind: pick.kind,
         source: 'r/celebs',
         by: d.author || '',
         link: d.permalink ? `https://reddit.com${d.permalink}` : ''
@@ -209,101 +175,79 @@ async function fetchCelebMedia(name, limit=25){
     if(added===0) log(`${name}: none with media`);
     else log(`${name}: +${added}`);
     return added;
-  }catch(err){
-    log(`${name}: error ${err?.message || err}`);
+  }catch(e){
+    log(`${name}: error ${e?.message||e}`);
     return 0;
   }
 }
-
-async function fetchCelebMediaWithRetry(name, limit=25, retries=2){
-  let added = 0;
+async function fetchCelebMediaWithRetry(name, limit=35, retries=1){
+  let n=0;
   for(let i=0;i<=retries;i++){
-    added += await fetchCelebMedia(name, limit);
-    if(added>0) break;
-    if(i<retries){ log(`${name}: retry ${i+1}/${retries}`); await sleep(600); }
+    n += await fetchCelebMedia(name, limit);
+    if(n>0) break;
+    if(i<retries){ log(`${name}: retry ${i+1}/${retries}`); await sleep(500); }
   }
-  return added;
+  return n;
 }
 
-/* ---------------------------
-   Rendering
----------------------------- */
+/* ------- render ------- */
 function renderOne(item){
-  const card = document.createElement('article');
-  card.className = 'card';
-
-  const frame = document.createElement('div');
-  frame.className = 'frame';
+  const card = document.createElement('article'); card.className='card';
+  const frame = document.createElement('div'); frame.className='frame';
 
   if(item.kind==='video'){
     const v = document.createElement('video');
-    v.src = item.url; v.controls = true; v.muted = true; v.playsInline = true; v.loop = true; v.autoplay = true;
+    v.src = item.url; v.controls=true; v.muted=true; v.playsInline=true; v.loop=true; v.autoplay=true;
     frame.appendChild(v);
   }else{
     const img = document.createElement('img');
-    img.loading = 'lazy'; img.decoding = 'async'; img.alt = item.title;
-    img.src = item.url;
+    img.loading='lazy'; img.decoding='async'; img.alt=item.title; img.src=item.url;
     frame.appendChild(img);
   }
 
-  const meta = document.createElement('div'); meta.className = 'meta';
-
+  const meta = document.createElement('div'); meta.className='meta';
   const left = document.createElement('div');
-  const title = document.createElement('div'); title.className = 'title'; title.textContent = item.title.replace(/\s*\(.*?\)\s*/,'').slice(0,40);
-  const src = document.createElement('div'); src.className='source'; src.textContent = item.source;
-  left.appendChild(title); left.appendChild(src);
+  const title = document.createElement('div'); title.className='title'; title.textContent=item.title.slice(0,40);
+  const src = document.createElement('div'); src.className='source'; src.textContent=item.source;
+  left.append(title,src);
 
   const actions = document.createElement('div'); actions.className='actions';
-  const like = document.createElement('button'); like.className = 'iconbtn fav'; like.innerHTML = '★';
-  like.onclick = ()=>{ try{ const ls=JSON.parse(localStorage.getItem('likes')||'[]'); ls.unshift(item); localStorage.setItem('likes', JSON.stringify(ls.slice(0,500))); toastShow('Saved ⭐'); }catch{} };
-  const nope = document.createElement('button'); nope.className='iconbtn bad'; nope.innerHTML='👎';
-  nope.onclick = ()=> card.remove();
+  const like = document.createElement('button'); like.className='iconbtn fav'; like.textContent='★';
+  like.onclick=()=>{ try{ const ls=JSON.parse(localStorage.getItem('likes')||'[]'); ls.unshift(item); localStorage.setItem('likes', JSON.stringify(ls.slice(0,500))); toastShow('Saved ⭐'); }catch{} };
+  const nope = document.createElement('button'); nope.className='iconbtn bad'; nope.textContent='👎';
+  nope.onclick=()=> card.remove();
+  actions.append(like,nope);
 
-  actions.append(like, nope);
-  meta.append(left, actions);
-
-  card.append(frame, meta);
+  meta.append(left,actions);
+  card.append(frame,meta);
   cardsEl.appendChild(card);
   shown++; updateMeters();
 }
-
 function renderMore(n=BATCH_PICK){
   if(pool.length===0){ log('No items in pool. Tap New batch.'); return; }
-  let c = 0;
-  while (c<n && pool.length){
-    const item = pool.shift();
-    renderOne(item);
-    c++;
-  }
+  let c=0; while(c<n && pool.length){ renderOne(pool.shift()); c++; }
 }
 
-/* ---------------------------
-   Orchestration
----------------------------- */
+/* ------- control flow ------- */
 async function buildNewBatch(){
-  cardsEl.innerHTML = ''; shown = 0; pool = []; updateMeters(); logEl.textContent='';
+  cardsEl.innerHTML=''; shown=0; pool=[]; updateMeters(); logEl.textContent='';
   log('Building…');
-  // Load a handful of names quickly (front chunk) then random few from the rest
-  const picks = [...PEOPLE.slice(0,8), ...shuffleArray(PEOPLE.slice(8)).slice(0,10)];
+  const picks=[...PEOPLE.slice(0,8), ...shuffleArray(PEOPLE.slice(8)).slice(0,10)];
   for(const name of picks){
-    await fetchCelebMediaWithRetry(name, 25, 1);
-    // brief spacing to reduce burstiness
-    await sleep(180);
+    await fetchCelebMediaWithRetry(name, 35, 1);
+    await sleep(160);
   }
   updateMeters();
-  if(pool.length===0) log('No media found. Try again.');
-  else { shuffleArray(pool); renderMore(); }
+  if(pool.length===0){ log('No media found. Try again.'); return; }
+  shuffleArray(pool); renderMore();
 }
 
-/* ---------------------------
-   Handlers
----------------------------- */
-document.getElementById('btnNew').onclick    = buildNewBatch;
-document.getElementById('btnLoad').onclick   = ()=> renderMore();
-document.getElementById('btnShuffle').onclick= ()=>{ shuffleArray(pool); log('Shuffled pool'); };
-document.getElementById('btnHome').onclick   = ()=>{ window.scrollTo({top:0,behavior:'smooth'}); };
+/* ------- events ------- */
+document.getElementById('btnNew').onclick=buildNewBatch;
+document.getElementById('btnLoad').onclick=()=>renderMore();
+document.getElementById('btnShuffle').onclick=()=>{ shuffleArray(pool); log('Shuffled pool'); };
+document.getElementById('btnHome').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
-/* First paint hint */
 updateMeters();
 </script>
 </body>
