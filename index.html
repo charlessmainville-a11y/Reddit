@@ -3,24 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Celeb Scroll — Build v6.2 (pastel)</title>
+<title>Celeb Scroll — Build v6.3 (pastel + proxy)</title>
 <style>
-  /* -------- Pastel palette -------- */
   :root{
-    --bg:#f7f5f2;         /* paper */
-    --ink:#2b2f36;        /* text */
-    --ink2:#606874;       /* secondary */
-    --card:#ffffff;       /* cards */
-    --edge:#eae6e1;       /* borders */
-    --mut:#f0ece8;        /* muted chips */
-    --accent:#ffc0cb;     /* rose */
-    --accent2:#a0d8ef;    /* baby blue */
-    --ok:#ffe07a;         /* like */
-    --bad:#ffb3a7;        /* dislike */
-    --chip:#e2f0ff;       /* source chip */
+    --bg:#f7f5f2; --ink:#2b2f36; --ink2:#606874; --card:#fff; --edge:#eae6e1;
+    --chip:#e2f0ff; --ok:#ffe07a; --bad:#ffb3a7;
   }
-
-  /* -------- Paper / concrete texture (pure CSS) -------- */
   html,body{height:100%;margin:0}
   body{
     color:var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -28,7 +16,6 @@
       radial-gradient(1200px 600px at 50% -15%, #ffffff 0%, rgba(255,255,255,0) 55%),
       radial-gradient(1000px 400px at 110% 10%, #fff6f8 0%, rgba(255,255,255,0) 60%),
       radial-gradient(1000px 400px at -10% 0%, #f0fbff 0%, rgba(255,255,255,0) 60%),
-      /* speckle layers to mimic concrete */
       radial-gradient(1px 1px at 30% 40%, rgba(0,0,0,.06) 0, rgba(0,0,0,0) 1px),
       radial-gradient(1px 1px at 70% 20%, rgba(0,0,0,.05) 0, rgba(0,0,0,0) 1px),
       radial-gradient(1px 1px at 20% 80%, rgba(0,0,0,.05) 0, rgba(0,0,0,0) 1px),
@@ -36,54 +23,29 @@
       var(--bg);
     background-size: auto, auto, auto, 12px 12px, 10px 10px, 14px 14px, 11px 11px, auto;
   }
-
   .bar{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;justify-content:center;padding:18px 16px}
-  .badge{
-    background:linear-gradient(180deg,#fff,#f7f7f7);
-    border:1px solid var(--edge); color:var(--ink);
-    padding:10px 14px;border-radius:14px;font-weight:800;letter-spacing:.2px;
-    box-shadow:0 6px 18px rgba(177,168,160,.25);
-  }
-  .pill{
-    background:linear-gradient(180deg,#ffffff,#f5f1ee);
-    border:1px solid var(--edge); color:var(--ink);
-    padding:12px 18px;border-radius:16px;font-weight:900;letter-spacing:.3px; cursor:pointer;
-    box-shadow:0 8px 22px rgba(180,170,160,.28);
-    transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
-    user-select:none;
-  }
-  .pill:hover{ transform:translateY(-1px); box-shadow:0 10px 26px rgba(170,160,150,.32);}
-  .pill.rose{ background:linear-gradient(180deg,#ffe6ec,#ffd8e2); border-color:#ffd2de;}
-  .pill.blue{ background:linear-gradient(180deg,#e4f4ff,#d8eeff); border-color:#d1eaff;}
-  .pill.warn{ background:linear-gradient(180deg,#fff3d6,#ffe8af); border-color:#ffe3a1;}
-
+  .badge{background:linear-gradient(180deg,#fff,#f7f7f7); border:1px solid var(--edge); padding:10px 14px;border-radius:14px;font-weight:800;box-shadow:0 6px 18px rgba(177,168,160,.25)}
+  .pill{background:linear-gradient(180deg,#ffffff,#f5f1ee); border:1px solid var(--edge); padding:12px 18px;border-radius:16px;font-weight:900; cursor:pointer; box-shadow:0 8px 22px rgba(180,170,160,.28); user-select:none}
+  .pill.rose{background:linear-gradient(180deg,#ffe6ec,#ffd8e2); border-color:#ffd2de}
+  .pill.blue{background:linear-gradient(180deg,#e4f4ff,#d8eeff); border-color:#d1eaff}
+  .pill.warn{background:linear-gradient(180deg,#fff3d6,#ffe8af); border-color:#ffe3a1}
   .stat{font-weight:900; color:#7a8696}
   .wrap{max-width:860px;margin:0 auto;padding:10px 14px}
   .grid{display:grid;gap:22px}
-
-  .card{
-    background:linear-gradient(180deg,#ffffff,#faf8f6);
-    border:1px solid var(--edge); border-radius:22px; overflow:hidden;
-    box-shadow:
-      0 26px 55px rgba(160,150,140,.20),
-      0 6px 18px rgba(160,150,140,.18);
-  }
+  .card{background:linear-gradient(180deg,#ffffff,#faf8f6); border:1px solid var(--edge); border-radius:22px; overflow:hidden; box-shadow:0 26px 55px rgba(160,150,140,.20), 0 6px 18px rgba(160,150,140,.18)}
   .mediaBox{position:relative;background:#fcfbf9;display:flex;justify-content:center;align-items:center;min-height:260px}
   img,video{max-width:100%;height:auto;display:block}
   video{background:#000; border-bottom:1px solid var(--edge)}
-
-  .meta{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px 16px;background:#fff}
-  .src{background:var(--chip); color:#2f4a66; border:1px solid #d2e5fb; padding:9px 12px; border-radius:12px;font-weight:800}
+  .meta{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff}
+  .src{background:#e2f0ff; color:#2f4a66; border:1px solid #d2e5fb; padding:9px 12px; border-radius:12px;font-weight:800}
   .actions{display:flex;gap:10px}
   .btn{border:0;padding:12px 18px;border-radius:14px;font-weight:900;cursor:pointer}
   .like{background:var(--ok)}
   .nope{background:var(--bad)}
   .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px dashed var(--edge); background:#fff}
   .small{color:var(--ink2);font-weight:700}
-
   .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2d3440;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .18s}
   .toast.show{opacity:1}
-
   dialog{border:0;border-radius:18px;max-width:720px;width:calc(100% - 28px);background:#ffffff;padding:0;border:1px solid var(--edge);box-shadow:0 24px 60px rgba(0,0,0,.28)}
   dialog::backdrop{background:rgba(0,0,0,.25)}
   .dgHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff7fb;border-bottom:1px solid #ffd7e6}
@@ -94,7 +56,7 @@
 <body>
   <div class="bar">
     <div class="badge">NSFW enabled • people-only</div>
-    <div class="badge">Build <strong id="build">v6.2</strong></div>
+    <div class="badge">Build <strong id="build">v6.3</strong></div>
   </div>
 
   <div class="bar">
@@ -105,10 +67,7 @@
     <button class="pill warn" id="trouble">Troubleshoot 🩺</button>
   </div>
 
-  <div class="wrap">
-    <div id="list" class="grid"></div>
-  </div>
-
+  <div class="wrap"><div id="list" class="grid"></div></div>
   <div id="toast" class="toast"></div>
 
   <dialog id="diag">
@@ -120,7 +79,7 @@
   </dialog>
 
 <script>
-/* ---------- curated list (weighted first) ---------- */
+/* ------------ Top names (front-weighted) ------------ */
 const TOP = [
  "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Madison Beer","Addison Rae","Sabrina Carpenter",
  "Sydney Sweeney","Dua Lipa","Alexandra Daddario","Ana de Armas","Emily Ratajkowski","Bella Hadid","Gigi Hadid",
@@ -128,37 +87,37 @@ const TOP = [
  "Scarlett Johansson","Gal Gadot","Selena Gomez","Kaia Gerber","Emma Watson","Ariana Grande","Doja Cat",
  "Taylor Swift","Anya Taylor-Joy","Kylie Jenner","Jenna Ortega","Zendaya","Suki Waterhouse","Nina Dobrev",
  "Barbara Palvin","Lily-Rose Depp","Sofia Vergara","Lily Collins","Sara Sampaio","Candice Swanepoel","Lais Ribeiro",
- "Elsa Hosk","Alexandra Shipp","Florence Pugh","Joey King","Lana Del Rey","Kiernan Shipka","Rachel Zegler",
+ "Elsa Hosk","Florence Pugh","Joey King","Lana Del Rey","Kiernan Shipka","Rachel Zegler",
  "Maitreyi Ramakrishnan","Millie Bobby Brown","Lily James","Halle Bailey","Camila Morrone","Katherine Langford",
  "Nicola Peltz","Becky G","Hannah Stocking","Sofia Carson","Chantel Jeffries","Sommer Ray",
  "Pia Wurtzbach","Iggy Azalea","Tzuyu","Karina aespa","Winter aespa","Momo Twice","Irene Red Velvet",
  "Rosé Blackpink","Lisa Blackpink","Jisoo Blackpink","Jennie Blackpink",
  "Janhvi Kapoor","Ananya Panday","Alia Bhatt","Kiara Advani","Disha Patani","Kriti Sanon","Rashmika Mandanna",
- "Sonal Chauhan","Tara Sutaria","Nora Fatehi","Mrunal Thakur","Sobhita Dhulipala","Keerthy Suresh","Tripti Dimri"
+ "Tara Sutaria","Nora Fatehi","Mrunal Thakur","Sobhita Dhulipala","Tripti Dimri"
 ];
 
-/* ---------- state ---------- */
-const state = { pool:[], shown:0, likes:[], log:[], building:false };
-const $ = s=>document.querySelector(s);
+/* ------------ State & utils ------------ */
+const state = { pool:[], shown:0, likes:[], log:[], building:false, proxy:"https://r.jina.ai/http/" };
+const $ = s => document.querySelector(s);
+const toast = msg => { const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); };
 const log = (...a)=>{ state.log.push(a.join(' ')); if($('#diag').open) $('#log').textContent = snapshot(); };
 const snapshot = ()=>[
   `Online: ${navigator.onLine}`,
   `UA: ${navigator.userAgent}`,
+  `Proxy: ${state.proxy}`,
   `Pool size: ${state.pool.length}, shown: ${state.shown}, likes: ${state.likes.length}`,
   `Last lines:`,
   ...state.log.slice(-16)
 ].join('\n');
-
-const toast = msg => { const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); };
 const setCounts = ()=>{ $('#shown').textContent=state.shown; $('#pool').textContent=state.pool.length; };
-
-/* ---------- tiny concurrency with retry/backoff ---------- */
 const delay = ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ------------ Robust fetch with retry ------------ */
 async function fetchWithRetry(url,{tries=3,timeout=9000,backoff=700}={}){
   for(let i=1;i<=tries;i++){
     try{
       const ctrl=new AbortController(); const id=setTimeout(()=>ctrl.abort(),timeout);
-      const res=await fetch(url,{signal:ctrl.signal,cache:'no-store'});
+      const res=await fetch(url,{signal:ctrl.signal,cache:'no-store',headers:{'Accept':'application/json'}});
       clearTimeout(id);
       if(!res.ok) throw new Error(res.status);
       return res;
@@ -170,16 +129,24 @@ async function fetchWithRetry(url,{tries=3,timeout=9000,backoff=700}={}){
   }
 }
 
-/* ---------- Reddit helpers (no API key) ---------- */
-const R=q=>`https://www.reddit.com${q}`;
+/* ------------ Reddit helpers w/ proxy ------------ */
+/* r.jina.ai requires absolute URL w/o scheme or w/ http(s) — both ok. */
+const prox = absUrl => {
+  // Ensure absolute URL and normalize to http(s) after proxy prefix.
+  const clean = absUrl.replace(/^https?:\/\//,'');
+  return state.proxy + 'https://' + clean;
+};
+// Use old.reddit.com (lighter) + raw_json=1
+const R = (q) => prox(`https://old.reddit.com${q}${q.includes('?')?'&':'?'}raw_json=1`);
+
 async function searchCeleb(name){
-  const u1=R(`/r/celebs/search.json?q=title:${encodeURIComponent(name)}&restrict_sr=1&sort=new&t=year&include_over_18=on&limit=12`);
-  const u2=R(`/search.json?q=${encodeURIComponent(name+' site:i.redd.it')}&sort=new&limit=12&include_over_18=on`);
-  const u3=R(`/r/celebs/new.json?limit=25&include_over_18=on`);
+  const u1 = R(`/r/celebs/search.json?q=title:${encodeURIComponent(name)}&restrict_sr=1&sort=new&t=year&include_over_18=on&limit=12`);
+  const u2 = R(`/search.json?q=${encodeURIComponent(name+' site:i.redd.it')}&sort=new&limit=12&include_over_18=on`);
+  const u3 = R(`/r/celebs/new.json?limit=25&include_over_18=on`);
   for(const u of [u1,u2,u3]){
     try{
-      const j=await (await fetchWithRetry(u)).json();
-      const posts=(j.data?.children||[]).map(c=>c.data);
+      const j = await (await fetchWithRetry(u)).json();
+      const posts = (j.data?.children||[]).map(c=>c.data);
       if(posts.length) return posts;
     }catch(e){}
   }
@@ -195,18 +162,17 @@ function pickMedia(p){
   let kind='img';
   if(/\.gifv$/.test(url)){ url=url.replace(/\.gifv$/,'\.mp4'); kind='vid'; }
   if(/\.mp4$|\.webm$/.test(url)) kind='vid';
-  if(/redgifs|gfycat/i.test(url)) return null; // avoiding CORS/429
+  if(/redgifs|gfycat/i.test(url)) return null;
   if(!/i\.redd\.it|i\.imgur\.com|\.gif$|\.jpg$|\.png$|\.mp4$|\.webm$/i.test(url)) return null;
   return {url,kind};
 }
 
-/* ---------- build & render ---------- */
-async function buildBatch(size=18){
+/* ------------ Build + render ------------ */
+async function buildBatch(){
   if(state.building) return;
   state.building=true; state.pool=[]; state.shown=0; $('#list').innerHTML=''; setCounts();
   log('Building new batch…');
 
-  // soft shuffle names and take a chunk
   const names=[...TOP];
   for(let i=names.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [names[i],names[j]]=[names[j],names[i]]; }
   const targets=names.slice(0,40);
@@ -261,15 +227,15 @@ function renderNext(n=4){
   setCounts();
 }
 
-/* ---------- controls ---------- */
-$('#newBatch').onclick=()=>buildBatch(18);
+/* ------------ Controls ------------ */
+$('#newBatch').onclick=()=>buildBatch();
 $('#loadMore').onclick=()=>renderNext(4);
 $('#shuffle').onclick=()=>{ state.pool.sort(()=>Math.random()-.5); toast('Shuffled'); };
 $('#trouble').onclick=()=>{ $('#log').textContent=snapshot(); $('#diag').showModal(); };
 $('#closeDiag').onclick=()=>$('#diag').close();
 
-/* ---------- initial ---------- */
-buildBatch(18).then(()=>renderNext(6));
+/* ------------ Init ------------ */
+buildBatch().then(()=>renderNext(6));
 </script>
 </body>
 </html>
