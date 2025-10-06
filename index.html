@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Feed Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: white;
+      text-align: center;
+    }
+    header {
+      padding: 1rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    #controls {
+      margin: 1rem;
+    }
+    button {
+      background: #ff4081;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin: 0.3rem;
+      border-radius: 6px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+    #feed {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card {
+      background: #161b22;
+      margin: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .actions {
+      margin-top: 0.5rem;
+    }
+    .actions button {
+      margin: 0 0.2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>✨ Reddit Viewer v1.0 ✨</header>
+  <div id="controls">
+    <button onclick="loadBatch()">New Batch</button>
+    <button onclick="shuffle()">Shuffle</button>
+  </div>
+  <div id="feed"></div>
+
+  <script>
+    const subreddits = [
+      "Celebs", "Models", "InstagramModels", "CuteGirls", "NSFW_Snapchat",
+      "charlidameliohot", "AddisonRae", "kendalljenner", "haileybieber"
+    ];
+
+    let posts = [];
+
+    async function fetchFromSubreddit(sub) {
+      try {
+        const res = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=10`);
+        const json = await res.json();
+        return json.data.children
+          .filter(p => p.data.url && (p.data.url.endsWith(".jpg") || p.data.url.endsWith(".png")))
+          .map(p => ({
+            title: p.data.title,
+            image: p.data.url,
+            source: sub
+          }));
+      } catch (e) {
+        console.error("Failed fetch:", sub, e);
+        return [];
+      }
+    }
+
+    async function loadBatch() {
+      document.getElementById("feed").innerHTML = "<p>Loading...</p>";
+      posts = [];
+      for (let sub of subreddits) {
+        const items = await fetchFromSubreddit(sub);
+        posts = posts.concat(items);
+      }
+      renderFeed();
+    }
+
+    function renderFeed() {
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+      if (posts.length === 0) {
+        feed.innerHTML = "<p>No posts found. Try again.</p>";
+        return;
+      }
+      posts.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${p.source}</h3>
+          <img src="${p.image}" alt="${p.title}">
+          <p>${p.title}</p>
+          <div class="actions">
+            <button onclick="like(this)">⭐</button>
+            <button onclick="dislike(this)">👎</button>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    function shuffle() {
+      posts.sort(() => Math.random() - 0.5);
+      renderFeed();
+    }
+
+    function like(btn) {
+      btn.parentElement.parentElement.style.border = "2px solid gold";
+    }
+
+    function dislike(btn) {
+      btn.parentElement.parentElement.remove();
+    }
+
+    // auto-load on first visit
+    loadBatch();
+  </script>
+</body>
+</html>
