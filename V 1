@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scroll Wall • Build v5.9 (Reddit + Manual Risqué)</title>
+<style>
+:root{--bg:#0c1116;--ink:#e9eef7;--muted:#9fb0c3;--panel:#121823;--rose:#ff6fa3;--shadow:rgba(0,0,0,.45)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:radial-gradient(1200px 500px at 50% -200px,#16202e,#0c1116) fixed;color:var(--ink);font:16px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+.wrap{max-width:880px;margin:20px auto;padding:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pill{background:#111826;border:1px solid #232f40;padding:12px 14px;border-radius:12px;cursor:pointer}
+.badge{background:linear-gradient(180deg,#ff7aa8,#ff4f8a);color:#071018;font-weight:800;padding:8px 12px;border-radius:10px}
+.grid{margin-top:14px;display:grid;gap:18px}
+.card{background:linear-gradient(180deg,#0f1520,#121a28);border:1px solid #193042;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px var(--shadow)}
+.ph{display:block;width:100%;height:auto;object-fit:cover;background:#071018}
+.meta{display:flex;justify-content:space-between;align-items:center;padding:12px}
+.src{background:#0c1622;padding:8px 12px;border-radius:10px;border:1px solid #123041;font-weight:800}
+.cta{display:flex;gap:8px}
+.btn{background:#ff6fa3;border:0;padding:8px 12px;border-radius:10px;font-weight:800;cursor:pointer}
+.btn.alt{background:#1b2936;color:#dfeeff}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 14px;border-radius:10px;background:#22161d;color:#ffdbe6;display:none}
+.overlay{position:fixed;inset:0;background:rgba(4,6,10,.7);display:none;align-items:center;justify-content:center;padding:18px}
+.panel{width:min(800px,96vw);max-height:88vh;overflow:auto;background:#0f1621;border:1px solid #18263a;border-radius:12px;padding:16px}
+.small{color:#9fb0c3;font-size:13px}
+.switch{display:inline-flex;align-items:center;gap:8px}
+.footer{margin-top:10px;color:#9fb0c3;font-size:13px}
+.tag{position:absolute;left:12px;top:12px;background:#0009;padding:6px 9px;border-radius:8px;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row" style="justify-content:space-between">
+    <div class="row">
+      <div class="pill" id="btnNew">New batch</div>
+      <div class="pill badge" id="btnMore">Load more</div>
+      <div class="pill" id="btnShuffle">Shuffle</div>
+    </div>
+    <div class="row">
+      <div class="pill switch" title="Include your manual risqué list"><label><input type="checkbox" id="toggleRisky"> Include manual risqué media</label></div>
+      <div class="pill" id="btnLiked">Liked ⭐ <span id="likedCount" class="small">0</span></div>
+      <div class="pill" id="btnTrouble">Troubleshoot</div>
+    </div>
+  </div>
+
+  <div class="small footer">⚠️ DO NOT add non-consensual, private, or illegal content to the manual list. Keep it legal & consensual.</div>
+
+  <div id="grid" class="grid"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Liked overlay -->
+<div id="likedOverlay" class="overlay">
+  <div class="panel">
+    <h3>Liked</h3>
+    <div id="likedList" class="grid" style="margin-top:12px"></div>
+    <div style="margin-top:12px" class="row"><div class="pill" id="btnCloseLiked">Close</div><div class="pill" id="btnExportLikes">Export</div><div class="pill" id="btnClearLikes">Clear</div></div>
+  </div>
+</div>
+
+<!-- Troubleshoot overlay -->
+<div id="tsOverlay" class="overlay">
+  <div class="panel">
+    <h3>Troubleshoot</h3>
+    <pre id="tsPre" style="white-space:pre-wrap"></pre>
+    <div style="margin-top:12px" class="row"><div class="pill" id="btnCloseTS">Close</div></div>
+  </div>
+</div>
+
+<script>
+/* ========= CONFIG =========
+   Edit only the riskyMedia array below (if you want risqué content).
+   Each item should be:
+     { url: "https://…jpg or mp4", type: "image"|"video", source: "note or credit" }
+   Example placeholders are provided. Replace with your own links.
+   ======================================================== */
+
+/* EDIT THIS LIST — ADD YOUR LINKS HERE */
+const riskyMedia = [
+  // EXAMPLES (placeholders — replace these with your own links)
+  // { url: "https://example.com/your-spicy-image1.jpg", type: "image", source: "manual-1" },
+  // { url: "https://example.com/your-spicy-video1.mp4", type: "video", source: "manual-2" }
+];
+/* ======================================================== */
+
+/* Reddit subs to pull from (SFW / public-friendly). Edit if you like. */
+const PEOPLE_SUBS = [
+  "Celebs","ModelPhotography","FashionModels","PrettyGirls","RedCarpet",
+  "AlexandraDaddario","EmilyRatajkowski","DuaLipa","EmmaWatson","SydneySweeney"
+];
+
+const STATE = {
+  pool: [], shown: 0, likes: loadLikes(), log: [], building:false
+};
+
+function $(id){ return document.getElementById(id); }
+function toast(msg, ms=1400){ const t=$('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none', ms); }
+function loadLikes(){ try{ return JSON.parse(localStorage.getItem('sw_likes')||'[]') }catch{ return [] } }
+function saveLikes(){ localStorage.setItem('sw_likes', JSON.stringify(STATE.likes)) }
+function updateLikedBadge(){ $('likedCount').textContent = String(STATE.likes.length) }
+
+/* UI wiring */
+$('btnNew').onclick = async ()=>{ await buildNewBatch(); };
+$('btnMore').onclick = ()=> loadMore();
+$('btnShuffle').onclick = ()=> shuffleGrid();
+$('btnLiked').onclick = ()=> openLiked();
+$('btnCloseLiked').onclick = ()=> $('likedOverlay').style.display='none';
+$('btnExportLikes').onclick = ()=> exportLikes();
+$('btnClearLikes').onclick = ()=> { if(confirm('Clear likes?')){ STATE.likes=[]; saveLikes(); updateLikedBadge(); openLiked(); } };
+$('btnTrouble').onclick = ()=> openTrouble();
+$('btnCloseTS').onclick = ()=> $('tsOverlay').style.display='none';
+
+updateLikedBadge();
+
+/* ======= Reddit-only fetcher (images and reddit-hosted mp4) ======= */
+async function fetchSubImages(sub, {limit=20, time='week'} = {}) {
+  const url = `https://www.reddit.com/r/${encodeURIComponent(sub)}/top.json?limit=${limit}&t=${time}&raw_json=1`;
+  try{
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if(!res.ok) { STATE.log.unshift(`${sub}: HTTP ${res.status}`); return []; }
+    const j = await res.json();
+    const out = [];
+    for(const c of (j.data?.children || [])){
+      const p = c.data;
+      if(p.stickied) continue;
+      // Prefer static images, skip large gifs/video unless reddit-hosted mp4
+      if(p.post_hint === 'image' && p.url && /\.(jpe?g|png)$/i.test(p.url)){
+        out.push({ url: p.url, type: 'image', source: `r/${p.subreddit}`, sub: p.subreddit });
+      } else if(p.is_video && p.media?.reddit_video?.fallback_url){
+        // reddit-hosted mp4
+        out.push({ url: p.media.reddit_video.fallback_url.replace(/&amp;/g,'&'), type: 'video', source: `r/${p.subreddit}`, sub: p.subreddit });
+      } else if(p.preview && p.preview.images && p.preview.images[0] && p.preview.images[0].source){
+        const u = p.preview.images[0].source.url.replace(/&amp;/g,'&');
+        if(!/\.(gif|webm|mp4)$/i.test(u)) out.push({ url: u, type: 'image', source: `r/${p.subreddit}`, sub: p.subreddit });
+      }
+    }
+    STATE.log.unshift(`${sub}: +${out.length}`);
+    return out;
+  }catch(e){
+    STATE.log.unshift(`${sub}: fetch error`);
+    return [];
+  }
+}
+
+/* ======= Batch builder that mixes manual risky list ======= */
+async function buildNewBatch(){
+  if(STATE.building) return;
+  STATE.building = true;
+  STATE.pool = []; STATE.shown = 0; $('grid').innerHTML = ''; renderCounter();
+  $('btnMore').classList.remove('badge'); // indicate disabled until we populate
+
+  const picks = shuffle([...PEOPLE_SUBS]).slice(0,8);
+  for(const sub of picks){
+    const items = await fetchSubImages(sub, {limit:16, time:'week'});
+    STATE.pool.push(...items);
+    await delay(140); // be polite
+  }
+
+  // If user enabled manual risky injection, append those items now
+  const includeRisky = $('toggleRisky').checked;
+  if(includeRisky && riskyMedia && riskyMedia.length){
+    // map riskyMedia entries into pool format
+    const asItems = riskyMedia.map((r,i)=>({
+      url: r.url,
+      type: r.type || (r.url.match(/\.(mp4|webm)$/i) ? 'video' : 'image'),
+      source: r.source || 'manual',
+      sub: r.source || 'manual'
+    }));
+    // interleave risky items among pool (so they don't all bunch up)
+    const mixed = [];
+    const chunk = Math.ceil(Math.max(1, STATE.pool.length / Math.max(1, asItems.length)));
+    let idx = 0;
+    for(let i=0;i<STATE.pool.length || idx<asItems.length;i++){
+      if(i < STATE.pool.length) mixed.push(STATE.pool[i]);
+      if((i+1) % chunk === 0 && idx < asItems.length){ mixed.push(asItems[idx++]); }
+    }
+    // if any remaining risky items, append them
+    while(idx < asItems.length) mixed.push(asItems[idx++]);
+    STATE.pool = mixed;
+    STATE.log.unshift(`Injected ${asItems.length} manual risky items`);
+  }
+
+  // dedupe by url and cap
+  const seen = new Set(); STATE.pool = STATE.pool.filter(it => {
+    const k = it.url; if(seen.has(k)) return false; seen.add(k); return true;
+  }).slice(0,80);
+
+  renderCounter();
+  if(STATE.pool.length) {
+    $('btnMore').classList.add('badge'); // enable
+    loadMore();
+    toast(`Batch ready • ${STATE.pool.length} items`);
+  } else {
+    toast('No media found — try New batch again');
+  }
+  STATE.building = false;
+}
+
+function loadMore(cnt=6){
+  const grid = $('grid');
+  let added = 0;
+  while(STATE.pool.length && added < cnt){
+    const it = STATE.pool.shift();
+    grid.appendChild(renderCard(it));
+    added++; STATE.shown++;
+  }
+  renderCounter();
+  if(STATE.pool.length === 0) $('btnMore').classList.remove('badge');
+}
+
+function renderCounter(){ $('counter')?.remove?.(); const c = document.createElement('div'); c.className='pill'; c.id='counter'; c.textContent = `${STATE.shown}/${STATE.shown + STATE.pool.length}`; document.querySelector('.row').appendChild(c); }
+
+/* ======= Card renderer ======= */
+function renderCard(item){
+  const wrap = document.createElement('div'); wrap.className='card';
+  if(item && item.type === 'video'){
+    const v = document.createElement('video'); v.className='ph'; v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true; v.controls=false;
+    const s = document.createElement('source'); s.src = item.url; s.type = 'video/mp4'; v.appendChild(s); wrap.appendChild(v);
+  } else {
+    const img = document.createElement('img'); img.className='ph'; img.loading='lazy'; img.src = item.url; wrap.appendChild(img);
+  }
+  const tag = document.createElement('div'); tag.className='tag'; tag.textContent = item.source || (`r/${item.sub||'manual'}`);
+  const meta = document.createElement('div'); meta.className='meta';
+  const src = document.createElement('div'); src.className='src'; src.textContent = item.source || (`r/${item.sub||''}`);
+  const cta = document.createElement('div'); cta.className='cta';
+  const like = document.createElement('button'); like.className='btn'; like.textContent='⭐';
+  const nope = document.createElement('button'); nope.className='btn alt'; nope.textContent='👎';
+  like.onclick = ()=>{ STATE.likes.unshift({t:Date.now(), url:item.url, type:item.type, source:item.source||item.sub}); saveLikes(); updateLikedBadge(); wrap.remove(); toast('Saved ⭐') };
+  nope.onclick = ()=>{ wrap.remove(); };
+  cta.appendChild(like); cta.appendChild(nope);
+  meta.appendChild(src); meta.appendChild(cta);
+  wrap.appendChild(tag); wrap.appendChild(meta);
+  return wrap;
+}
+
+/* ======= Liked overlay & utils ======= */
+function openLiked(){ const overlay = $('likedOverlay'); const list = $('likedList'); list.innerHTML=''; if(!STATE.likes.length){ list.textContent='Nothing liked yet'; } else { STATE.likes.forEach(it=>{ const c = document.createElement('div'); c.className='card'; const media = document.createElement(it.type==='video'?'video':'img'); media.className='ph'; if(it.type==='video'){ media.src = it.url; media.controls=true; } else { media.src = it.url; } const meta=document.createElement('div'); meta.className='meta'; const s=document.createElement('div'); s.className='src'; s.textContent = it.source || ''; const del=document.createElement('button'); del.className='btn alt'; del.textContent='Remove'; del.onclick=()=>{ STATE.likes = STATE.likes.filter(x=>x!==it); saveLikes(); updateLikedBadge(); openLiked(); }; meta.appendChild(s); meta.appendChild(del); c.appendChild(media); c.appendChild(meta); list.appendChild(c); }); } overlay.style.display='flex'; }
+function saveLikes(){ localStorage.setItem('sw_likes', JSON.stringify(STATE.likes)); updateLikedBadge(); }
+function exportLikes(){ const blob = new Blob([JSON.stringify(STATE.likes, null, 2)], {type:'application/json'}); const a=document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='likes.json'; a.click(); }
+
+/* ======= Shuffle grid ======= */
+function shuffleGrid(){ const grid = $('grid'); const kids = Array.from(grid.children); shuffle(kids); kids.forEach(k=>grid.appendChild(k)); toast('Shuffled'); }
+
+/* ======= Troubleshoot ======= */
+function openTrouble(){ const pre = $('tsPre'); pre.textContent = `Pool: ${STATE.pool.length}, shown: ${STATE.shown}, likes: ${STATE.likes.length}\nLast logs:\n${STATE.log.slice(0,30).join('\n')}`; $('tsOverlay').style.display='flex'; }
+
+/* ======= Helpers ======= */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)) }
+
+/* ======= Boot ======= */
+(async ()=>{ STATE.likes = loadLikes(); updateLikedBadge(); // initial build
+  await buildNewBatch();
+})();
+
+</script>
+</body>
+</html>
