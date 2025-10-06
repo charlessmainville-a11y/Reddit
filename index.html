@@ -3,323 +3,366 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Celebs Wall — pastel dark</title>
+<title>Celeb Wall • v6.3</title>
 <style>
   :root{
-    --bg:#0f1116;            /* dark base */
-    --card:#151926;          /* dark card */
-    --muted:#9fb0c8;         /* soft steel */
-    --text:#eaf2ff;          /* near-white */
-    --accent:#ffc7ec;        /* pastel pink */
-    --accent-2:#b9f3ff;      /* pastel cyan */
-    --accent-3:#c8ffcf;      /* pastel mint */
-    --warn:#ffadad;
-
+    --bg:#0e0f12;
+    --panel:#141620;
+    --muted:#8187a1;
+    --text:#e8ebf7;
+    --chip:#222533;
+    --btn:#f7a9c0;         /* pastel pink */
+    --btn2:#9bbff9;        /* pastel blue */
+    --btnText:#141620;
+    --accent:#ffd86b;      /* like star */
+    --danger:#ff9aa2;      /* dislike */
     --radius:18px;
-    --gap:16px;
+    --gap:14px;
+    --shadow:0 12px 32px rgba(0,0,0,.35);
+    --headerH:72px;        /* updated dynamically too */
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; background:linear-gradient(180deg,#0f1116 0%, #121627 60%, #0f1116 100%);
-    color:var(--text); font:16px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    margin:0;
+    background: radial-gradient(1200px 800px at 10% -10%, #1b2030 0%, transparent 60%) no-repeat,
+                radial-gradient(900px 600px at 110% -20%, #241b30 0%, transparent 60%) no-repeat,
+                var(--bg);
+    color:var(--text);
+    font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
   }
-  .wrap{max-width:820px;margin:20px auto;padding:0 14px}
-  .row{display:flex;gap:var(--gap);flex-wrap:wrap;align-items:center}
-  .toolbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(15,17,22,.95), rgba(15,17,22,.65));backdrop-filter: blur(8px);padding:12px 0 10px}
-  .chip{border:1px solid rgba(255,255,255,.08);background:#121629;border-radius:999px;color:var(--text);
-        padding:10px 14px;font-weight:650;letter-spacing:.2px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
-  .chip.accent{background:linear-gradient(135deg,var(--accent),#ffd9fb); color:#221; }
-  .chip.ghost{opacity:.7}
-  .sp{flex:1 1 auto}
 
-  .panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:14px 14px}
-  .meter{min-width:88px;text-align:center;font-weight:800;letter-spacing:.6px;background:rgba(255,255,255,.03);padding:12px;border-radius:14px}
-  .btn{cursor:pointer;border:0;border-radius:14px;padding:14px 18px;font-weight:800}
-  .btn.pink{background:linear-gradient(135deg,var(--accent),#ffd2f4);color:#2b2530}
-  .btn.gray{background:#1b2134;color:var(--text)}
+  /* Header */
+  .header{
+    position:fixed; inset:0 0 auto 0; height:var(--headerH);
+    display:flex; gap:10px; align-items:center;
+    padding:12px 14px;
+    background: linear-gradient(180deg, rgba(10,11,14,.92), rgba(10,11,14,.70) 60%, transparent);
+    backdrop-filter: blur(8px);
+    z-index:30;
+  }
+  .brand{font-weight:800; letter-spacing:.3px; margin-right:6px}
+  .pill{
+    height:42px; padding:0 16px; border-radius:999px; border:1px solid #2a2f45;
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--panel); color:var(--text); box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .pill.ghost{background:#141620cc}
+  .pill .small{opacity:.7; font-weight:600}
+
+  .row{display:flex; gap:10px; align-items:center}
+  .sp{flex:1}
+
+  /* Content wrapper with padding so header never covers it */
+  .wrap{padding:calc(var(--headerH) + 10px) 14px 80px}
+
+  /* Control panel */
+  .controls{
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--gap);
+    margin:10px 0 16px;
+  }
+  .btn{
+    height:54px; border-radius:14px; border:0; cursor:pointer;
+    font-weight:800; letter-spacing:.2px;
+    box-shadow:var(--shadow);
+  }
+  .btn.pink{background:var(--btn); color:var(--btnText)}
+  .btn.blue{background:var(--btn2); color:#0d1220}
+  .btn.dark{background:var(--chip); color:var(--text); border:1px solid #2b3047}
   .btn:active{transform:translateY(1px)}
 
-  /* Card */
-  .card{background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:22px; overflow:hidden; margin:18px 0; box-shadow:0 6px 30px rgba(0,0,0,.35)}
-  .hero{position:relative; background:#0b0d12;}
-  .hero img,.hero video{display:block; width:100%; height:auto; max-height:72vh; object-fit:cover}
+  /* Grid of cards */
+  .grid{display:grid; grid-template-columns:1fr; gap:18px; max-width:820px; margin:0 auto}
+  @media(min-width:760px){ .grid{grid-template-columns:1fr 1fr} }
+
+  .card{
+    border-radius:22px;
+    background:linear-gradient(180deg,#181c29 0%, #121522 100%);
+    padding:14px;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .mediaWrap{
+    position:relative; overflow:hidden; border-radius:16px;
+    background:#0b0d13; aspect-ratio: 4/5; /* tall-ish portrait default */
+  }
+  .mediaWrap img, .mediaWrap video{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
   .badge{
-    position:absolute; top:8px; left:8px; font-size:12px; color:#081018; background:linear-gradient(135deg,var(--accent-2),#e7feff);
-    border-radius:999px; padding:6px 10px; font-weight:900; box-shadow:0 6px 16px rgba(0,0,0,.25)}
-  .foot{display:flex;align-items:center;gap:10px;padding:14px}
-  .sub{background:#0f1425;border:1px solid rgba(255,255,255,.07);padding:9px 12px;border-radius:12px;font-weight:700;color:var(--muted)}
-  .act{margin-left:auto; display:flex; gap:10px}
-  .pill{width:56px; height:48px; border-radius:14px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.08)}
-  .pill.like{background:linear-gradient(135deg,var(--accent-3),#e7ffe9); color:#173118}
-  .pill.dis{background:linear-gradient(135deg,var(--accent-2),#d8f9ff); color:#0e2633}
-  .pill svg{width:22px;height:22px}
+    position:absolute; top:10px; left:10px;
+    background:#0c0f18cc; border:1px solid #2a2f45;
+    padding:8px 12px; border-radius:999px; font-weight:800; font-size:13px;
+  }
+  .title{font-size:20px; font-weight:900; letter-spacing:.2px}
+  .meta{opacity:.7; font-weight:600}
 
-  .muted{color:var(--muted)}
-  .tip{margin-top:8px;color:var(--muted);font-size:13px}
-  .hidden{display:none}
+  .actions{display:flex; gap:10px}
+  .like,.dislike{
+    flex:1; height:48px; border-radius:14px; border:0; cursor:pointer; font-weight:900;
+  }
+  .like{background:var(--accent); color:#2a1a00}
+  .dislike{background:var(--danger); color:#3a0e12}
 
-  /* Modal */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px}
-  .modal.open{display:flex}
-  .sheet{max-width:820px;width:100%;background:#0f1320;border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:16px}
-  pre{white-space:pre-wrap;background:#0c101a;border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,.08);color:#e6f1ff}
+  /* toast */
+  .toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px);
+    background:#0c1019; color:var(--text); border:1px solid #2b3047;
+    padding:12px 16px; border-radius:999px; box-shadow:var(--shadow); opacity:0;
+    transition:.2s ease; z-index:40; font-weight:700;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 
-  /* pastel highlights */
-  .hl{background:linear-gradient(90deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  /* modal */
+  .modal{position:fixed; inset:0; display:none; place-items:center; z-index:50}
+  .modal.open{display:grid}
+  .modal::before{content:""; position:absolute; inset:0; background:rgba(10,11,14,.65); backdrop-filter:blur(8px)}
+  .sheet{
+    position:relative; width:min(820px,92vw); max-height:80vh; overflow:auto;
+    background:linear-gradient(180deg,#1b1e2a 0%, #141824 100%);
+    border:1px solid #2b3047; border-radius:18px; padding:16px; box-shadow:var(--shadow);
+  }
+  pre{white-space:pre-wrap; margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#f1f3ff}
+  a{color:#bcd3ff; text-decoration: none}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="toolbar">
-      <div class="row">
-        <div class="chip ghost">NSFW enabled • people-only</div>
-        <div class="sp"></div>
-        <div class="chip">Build <span id="build">v6.3</span></div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn gray" id="btnLiked">Liked ⭐</button>
-        <button class="btn gray" id="btnTrouble">Troubleshoot 🩺</button>
-        <div class="sp"></div>
-        <span class="meter" id="meter">0/0</span>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn gray" id="btnNew">New batch</button>
-        <button class="btn pink" id="btnMore">Load more</button>
-        <button class="btn gray" id="btnShuffle">Shuffle 🔀</button>
-      </div>
-    </div>
-
-    <div id="feed"></div>
-
-    <p class="tip">Source: <span class="hl">r/celebs</span> • images & GIFs only • likes saved locally</p>
+  <!-- Header -->
+  <div class="header" id="hdr">
+    <div class="pill ghost brand">Celeb Wall</div>
+    <div class="pill ghost small">NSFW enabled • people-only • r/celebs</div>
+    <div class="sp"></div>
+    <button class="pill" id="likedBtn">⭐ Liked <span id="likedCount" class="small">0</span></button>
+    <button class="pill" id="tsBtn">🩺 Troubleshoot</button>
   </div>
 
-  <!-- Troubleshoot -->
+  <div class="wrap">
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn dark" id="newBatch">New batch</button>
+      <button class="btn pink" id="loadMore">Load more</button>
+      <button class="btn blue" id="shuffleBtn">Shuffle 🔀</button>
+    </div>
+
+    <!-- Counter -->
+    <div class="row" style="max-width:820px;margin:0 auto 10px">
+      <div class="pill ghost small">Build v6.3</div>
+      <div class="sp"></div>
+      <div class="pill ghost small">Shown <b id="shown">0</b> • Pool <b id="pool">0</b></div>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- Troubleshoot Modal -->
   <div class="modal" id="modal">
     <div class="sheet">
       <div class="row" style="margin-bottom:8px">
-        <div class="chip">Troubleshoot</div>
+        <div class="pill ghost small">Troubleshoot</div>
         <div class="sp"></div>
-        <button class="btn pink" id="closeModal">Close</button>
+        <button class="btn pink" id="closeModal">✕ Close</button>
       </div>
       <pre id="log"></pre>
     </div>
   </div>
 
+  <div class="toast" id="toast">Saved</div>
+
 <script>
-(() => {
-  /*** CONFIG ***/
-  const SUBREDDIT = 'celebs';
-  const NAMES = [
-    // A compact list; you can extend to 100 easily.
-    "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Addison Rae","Madison Beer",
-    "Sabrina Carpenter","Sydney Sweeney","Alexandra Daddario","Ana de Armas","Emily Ratajkowski",
-    "Dua Lipa","Taylor Hill","Kaia Gerber","Bella Hadid","Gigi Hadid","Vanessa Hudgens","Megan Fox",
-    "Emilia Clarke","Gal Gadot","Margot Robbie","Camila Mendes","Alexis Ren","Sommer Ray",
-    "Barbara Palvin","Lily-Rose Depp","Elsa Hosk","Sara Sampaio","Candice Swanepoel","Irina Shayk"
-  ];
+/* -------------------- Names (100) -------------------- */
+const NAMES = [
+  "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Madison Beer",
+  "Addison Rae","Dua Lipa","Sabrina Carpenter","Sydney Sweeney","Alexandra Daddario",
+  "Emily Ratajkowski","Ana de Armas","Selena Gomez","Margot Robbie","Bella Hadid",
+  "Gigi Hadid","Kaia Gerber","Vanessa Hudgens","Alexandra Stan","Rachel Cook",
+  "Alycia Debnam-Carey","Mia Khalifa","Keke Palmer","Emilia Clarke","Jennifer Lawrence",
+  "Anya Taylor-Joy","Irina Shayk","Candice Swanepoel","Taylor Hill","Lily-Rose Depp",
+  "Barbara Palvin","Karen Gillan","Lily Collins","Megan Fox","Emma Watson",
+  "Ariana Grande","Becky G","Doja Cat","Rita Ora","Nina Dobrev",
+  "Camila Mendes","Camila Cabello","Gal Gadot","Elizabeth Olsen","Florence Pugh",
+  "Hunter Schafer","Zendaya","Jenna Ortega","Kylie Jenner","Suki Waterhouse",
+  "Miranda Kerr","Adriana Lima","Sara Sampaio","Jordyn Woods","Sofía Vergara",
+  "Eiza González","Zoë Kravitz","Vanessa Morgan","Ana de la Reguera","Lili Reinhart",
+  "Dakota Johnson","Mila Kunis","Lucy Hale","Priyanka Chopra","Shay Mitchell",
+  "Karlie Kloss","Joey King","Victoria Justice","Lana Del Rey","Bebe Rexha",
+  "Halsey","Charli XCX","Reneé Rapp","Madelyn Cline","Chlöe Bailey",
+  "Halle Bailey","Maude Apatow","Phoebe Dynevor","Natalie Portman","Kate Beckinsale",
+  "Jodie Comer","Saoirse Ronan","Emma Stone","Katherine Langford","Alexis Ren",
+  "Sommer Ray","Dixie D'Amelio","Tate McRae","Ava Max","Maitreyi Ramakrishnan",
+  "Lindsey Pelas","Paige Spiranac","Alisha Lehmann","Sasha Luss","Olivia Rodrigo",
+  "Kim Kardashian","Kourtney Kardashian","Lori Harvey","Megan Thee Stallion","Iggy Azalea"
+];
 
-  /*** STATE ***/
-  const st = {
-    pool: [], shown: 0, likes: loadLikes(), logLines: []
+/* -------------------- DOM -------------------- */
+const grid = document.getElementById('grid');
+const shownEl = document.getElementById('shown');
+const poolEl = document.getElementById('pool');
+const toast = document.getElementById('toast');
+const modal = document.getElementById('modal');
+const logEl = document.getElementById('log');
+const likedBtn = document.getElementById('likedBtn');
+const likedCount = document.getElementById('likedCount');
+
+/* -------------------- State -------------------- */
+let POOL = [];        // queued posts
+let SHOWN = 0;        // displayed count
+let LIKED = JSON.parse(localStorage.getItem('liked_v1')||'[]'); // store liked
+updateLikedCount();
+
+/* -------------------- Utils -------------------- */
+function note(s){ const stamp = new Date().toLocaleTimeString(); log(`${stamp} — ${s}`); }
+function log(s){ logEl.textContent = `Build: v6.3\nPool size: ${POOL.length}, shown: ${SHOWN}, likes: ${LIKED.length}\n\n` + s + "\n" + logEl.textContent.split("\n").slice(0,500).join("\n"); }
+function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1400); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j = (Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]] } return a }
+
+/* Set header height padding so menu never covers content */
+function setHeaderHeight(){
+  const h = document.getElementById('hdr').offsetHeight || 72;
+  document.documentElement.style.setProperty('--headerH', h+'px');
+}
+addEventListener('load', setHeaderHeight);
+addEventListener('resize', setHeaderHeight);
+
+/* -------------------- Fetch from Reddit (CORS-safe) -------------------- */
+/* We use r.jina.ai as a read-only proxy (no API key), pointing to old.reddit JSON. */
+async function searchCeleb(name, limit=8){
+  // Encode and build URL
+  const q = encodeURIComponent(name);
+  const url = `https://r.jina.ai/http://old.reddit.com/r/celebs/search.json?q=${q}&restrict_sr=on&include_over_18=on&sort=new&limit=${limit}`;
+  try{
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const children = (data.data && data.data.children) ? data.data.children : [];
+    // Map to a simple post object, filter image/gif from i.redd.it or reddit-hosted gif
+    const items = children.map(c=> c.data ).filter(d=>{
+      if(!d) return false;
+      const over18 = !!d.over_18; // NSFW allowed
+      const domain = d.domain || '';
+      const url = d.url_overridden_by_dest || d.url || '';
+      const postHint = d.post_hint || '';
+      // Allow direct reddit image/gif; skip external hosts to avoid CORS
+      const okDomain = /i\.redd\.it$/.test(domain) || /i\.redd\.it/.test(url) || (domain==='i.redd.it');
+      const isImg = postHint==='image' || /\.(jpg|jpeg|png)$/i.test(url);
+      const isGif = /\.(gif)$/i.test(url);
+      return over18 || true, okDomain && (isImg || isGif);
+    }).map(d=>({
+        name,
+        sub: d.subreddit_name_prefixed,
+        url: d.url_overridden_by_dest || d.url,
+        title: d.title,
+        id: d.id,
+        created: d.created_utc
+    }));
+    note(`${name}: +${items.length}`);
+    return items;
+  }catch(err){
+    note(`${name}: Load failed (${err.message})`);
+    return [];
+  }
+}
+
+/* Build a new pool by sampling names and fetching each */
+async function buildPool(batchSize=10){
+  POOL.length = 0;
+  SHOWN = 0; syncCounters();
+  grid.innerHTML = '';
+  const sample = shuffle([...NAMES]).slice(0, batchSize);
+  note(`Building new batch…`);
+  // fetch in small parallel groups to avoid throttling
+  for(let i=0;i<sample.length;i+=2){
+    const chunk = sample.slice(i,i+2);
+    const results = await Promise.all(chunk.map(n=>searchCeleb(n, 8)));
+    results.forEach(arr=> POOL.push(...arr));
+  }
+  shuffle(POOL);
+  note(`Pool ready: ${POOL.length} items`);
+  syncCounters();
+}
+
+/* Load more cards to the grid */
+function loadMore(count=6){
+  if(POOL.length===0){ note('No fresh posts. Tap New batch again.'); showToast('No fresh posts'); return; }
+  const slice = POOL.splice(0,count);
+  slice.forEach(post=> grid.appendChild(renderCard(post)) );
+  SHOWN += slice.length; syncCounters();
+}
+
+/* Shuffle current queue (and a subtle message) */
+function reshuffle(){
+  shuffle(POOL);
+  showToast('Shuffled');
+  note('Shuffled pool.');
+}
+
+/* -------------------- Render -------------------- */
+function renderCard(post){
+  const card = document.createElement('div'); card.className='card';
+  const media = document.createElement('div'); media.className='mediaWrap';
+  const src = post.url;
+  const isGif = /\.gif$/i.test(src);
+
+  if(isGif){
+    const vid = document.createElement('video');
+    vid.src = src;
+    vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
+    media.appendChild(vid);
+  }else{
+    const img = document.createElement('img'); img.src = src; img.loading='lazy';
+    media.appendChild(img);
+  }
+
+  const badge = document.createElement('div'); badge.className='badge';
+  badge.textContent = post.name;
+  media.appendChild(badge);
+
+  const title = document.createElement('div'); title.className='title'; title.textContent = post.name;
+  const meta = document.createElement('div'); meta.className='meta';
+  meta.innerHTML = `Source: <a href="https://old.reddit.com/${post.sub}/" target="_blank" rel="noopener">${post.sub}</a> • images & gifs only`;
+
+  const actions = document.createElement('div'); actions.className='actions';
+  const like = document.createElement('button'); like.className='like'; like.textContent='⭐ Like';
+  const dislike = document.createElement('button'); dislike.className='dislike'; dislike.textContent='👎 Dismiss';
+
+  like.onclick = ()=>{
+    LIKED.unshift({t:Date.now(),...post});
+    localStorage.setItem('liked_v1', JSON.stringify(LIKED.slice(0,500)));
+    updateLikedCount();
+    card.remove(); note(`Liked: ${post.name}`);
   };
+  dislike.onclick = ()=>{ card.remove(); note(`Dismissed: ${post.name}`) };
 
-  /*** DOM ***/
-  const feed = document.getElementById('feed');
-  const meter = document.getElementById('meter');
-  const logEl = document.getElementById('log');
-  const modal = document.getElementById('modal');
+  actions.append(like,dislike);
+  card.append(media,title,meta,actions);
+  return card;
+}
 
-  document.getElementById('btnNew').onclick = buildNewBatch;
-  document.getElementById('btnMore').onclick = loadMore;
-  document.getElementById('btnShuffle').onclick = () => { shuffle(st.pool); renderFresh(); note('Shuffled pool.'); };
-  document.getElementById('btnTrouble').onclick = () => showLog();
-  document.getElementById('closeModal').onclick = () => modal.classList.remove('open');
-  document.getElementById('btnLiked').onclick = showLiked;
+function updateLikedCount(){ likedCount.textContent = LIKED.length; }
+function syncCounters(){ poolEl.textContent = POOL.length; shownEl.textContent = SHOWN; }
 
-  /*** HELPERS ***/
-  function note(s){ st.logLines.unshift(`[${new Date().toLocaleTimeString()}] ${s}`); logEl.textContent = `Build: v6.3\nPool size: ${st.pool.length}, shown: ${st.shown}, likes: ${Object.keys(st.likes).length}\n\n`+st.logLines.join('\n'); }
-  function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=(Math.random()* (i+1))|0; [a[i],a[j]]=[a[j],a[i]];} return a; }
-  function loadLikes(){ try{ return JSON.parse(localStorage.getItem('likes_v2')||'{}'); }catch(e){ return {}; } }
-  function saveLikes(){ localStorage.setItem('likes_v2', JSON.stringify(st.likes)); }
-  function setMeter(){ meter.textContent = `${st.shown}/${st.pool.length}`; }
+/* -------------------- Liked view -------------------- */
+likedBtn.onclick = ()=>{
+  if(LIKED.length===0){ showToast('No likes yet'); return; }
+  grid.innerHTML = '';
+  SHOWN = 0; POOL.length = 0; syncCounters();
+  LIKED.forEach(item=> grid.appendChild(renderCard(item)));
+  note('Opened Liked.');
+};
 
-  /*** REDDIT FETCH ***/
-  async function fetchCelebPosts(name, after=''){
-    // Use api.reddit.com which allows CORS. Search inside r/celebs for <name> and only links.
-    const url = new URL(`https://api.reddit.com/r/${SUBREDDIT}/search.json`);
-    url.searchParams.set('q', name);
-    url.searchParams.set('restrict_sr', 'on');
-    url.searchParams.set('include_over_18','on');
-    url.searchParams.set('sort','new');
-    url.searchParams.set('limit','25');
-    if(after) url.searchParams.set('after', after);
+/* -------------------- Troubleshoot modal -------------------- */
+document.getElementById('tsBtn').onclick = ()=>{ modal.classList.add('open'); };
+document.getElementById('closeModal').onclick = ()=> modal.classList.remove('open');
+modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
 
-    const res = await fetch(url.toString(), { headers:{ 'Accept':'application/json' }});
-    if(!res.ok){ throw new Error(`HTTP ${res.status}`); }
-    const json = await res.json();
-    const items = (json.data?.children||[])
-      .map(x => x.data)
-      .filter(d => isMedia(d))
-      .map(normalizePost);
-    return {items, after: json.data?.after||''};
-  }
+/* -------------------- Buttons -------------------- */
+document.getElementById('newBatch').onclick = ()=> buildPool(12);
+document.getElementById('loadMore').onclick = ()=> loadMore(6);
+document.getElementById('shuffleBtn').onclick = reshuffle;
 
-  function isMedia(d){
-    if(d.removed_by_category || d.removed_by || d.banned_by) return false;
-    if(d.over_18 === false) ; // allow both
-    if(d.is_video && d.media?.reddit_video?.fallback_url) return true;
-    if(d.post_hint === 'image' && d.url) return true;
-    if(d.is_gallery && d.media_metadata) return true;
-    if(d.domain?.includes('i.redd.it') || d.domain?.includes('i.imgur.com')) return true;
-    if(d.preview?.images?.length) return true;
-    if(d.media?.oembed?.thumbnail_url) return true;
-    return false;
-  }
+/* -------------------- First view -------------------- */
+buildPool(10).then(()=> loadMore(6));
 
-  function normalizePost(d){
-    // Try to produce a displayable (img or video) URL
-    let medias = [];
-
-    if(d.is_video && d.media?.reddit_video?.fallback_url){
-      medias.push({type:'video', src:d.media.reddit_video.fallback_url});
-    }
-    if(d.is_gallery && d.media_metadata){
-      for(const key of Object.keys(d.media_metadata)){
-        const m = d.media_metadata[key];
-        const s = m.s?.u || m.s?.gif || m.s?.mp4;
-        if(s) medias.push({type:'image', src: s.replace(/&amp;/g,'&')});
-      }
-    }
-    if(d.post_hint === 'image' && d.url){
-      medias.push({type:'image', src:d.url});
-    }
-    if(medias.length===0 && d.preview?.images?.[0]?.source?.url){
-      medias.push({type:'image', src:d.preview.images[0].source.url.replace(/&amp;/g,'&')});
-    }
-    return {
-      id: d.id,
-      name: extractNameFromTitle(d.title),
-      sub: d.subreddit_name_prefixed || 'r/celebs',
-      permalink: 'https://reddit.com'+(d.permalink||''),
-      medias
-    };
-  }
-
-  function extractNameFromTitle(t){
-    // pick the first known name present in title, else title itself
-    const low = t.toLowerCase();
-    const hit = NAMES.find(n => low.includes(n.toLowerCase().split("'").join("")));
-    return hit || t.replace(/\s*\(.*?\)\s*/g,'').slice(0,40);
-  }
-
-  /*** BUILD / LOAD / RENDER ***/
-  async function buildNewBatch(){
-    st.pool.length = 0; st.shown = 0; renderFresh(); setMeter();
-    note('Building new batch…');
-
-    // choose 8 random names, fetch in parallel, collect media
-    const pick = shuffle([...NAMES]).slice(0, 8);
-    try{
-      const results = await Promise.allSettled(pick.map(n => fetchCelebPosts(n)));
-      let added = 0;
-      results.forEach((r,i)=>{
-        if(r.status==='fulfilled'){
-          r.value.items.forEach(item=>{
-            // weed out posts without renderable media
-            if(item.medias && item.medias.length){
-              st.pool.push(item);
-              added++;
-            }
-          });
-          note(`${pick[i]}: +${r.value.items.length}`);
-        }else{
-          note(`${pick[i]}: ${r.reason?.message||'Load failed'}`);
-        }
-      });
-      shuffle(st.pool);
-      renderFresh();
-      setMeter();
-      if(st.pool.length===0) note('No media posts found. Try New batch again.');
-    }catch(e){
-      note('Batch error: '+e.message);
-    }
-  }
-
-  function renderFresh(){
-    feed.innerHTML = '';
-    st.pool.slice(0, 6).forEach(renderCard);
-  }
-
-  function loadMore(){
-    const next = st.pool.slice(feed.children.length, feed.children.length + 6);
-    next.forEach(renderCard);
-    if(next.length===0) note('No more in this batch. Tap New batch.');
-  }
-
-  function renderCard(item){
-    st.shown++; setMeter();
-    const c = document.createElement('div');
-    c.className = 'card';
-
-    // media area
-    const hero = document.createElement('div');
-    hero.className = 'hero';
-
-    if(item.medias[0].type === 'video'){
-      const v = document.createElement('video');
-      v.src = item.medias[0].src; v.autoplay = true; v.muted = true; v.loop = true; v.playsInline = true;
-      hero.appendChild(v);
-    }else{
-      const img = document.createElement('img');
-      img.loading = 'lazy'; img.src = item.medias[0].src;
-      hero.appendChild(img);
-    }
-    const badge = document.createElement('div'); badge.className='badge'; badge.textContent = item.name;
-    hero.appendChild(badge);
-
-    const foot = document.createElement('div'); foot.className='foot';
-    const sub = document.createElement('a'); sub.className='sub muted'; sub.href=item.permalink; sub.target='_blank'; sub.textContent=item.sub;
-    const act = document.createElement('div'); act.className='act';
-    const like = document.createElement('button'); like.className='pill like'; like.innerHTML=starSVG();
-    const dis  = document.createElement('button'); dis.className='pill dis'; dis.innerHTML=downSVG();
-
-    like.onclick = () => {
-      st.likes[item.id] = item;
-      saveLikes();
-      like.style.opacity=.6;
-    };
-    dis.onclick = () => { c.remove(); };
-
-    act.append(like, dis);
-    foot.append(sub, act);
-
-    c.append(hero, foot);
-    feed.append(c);
-  }
-
-  /*** LIKED VIEW ***/
-  function showLiked(){
-    const arr = Object.values(st.likes);
-    feed.innerHTML = '';
-    if(arr.length===0){ note('No likes yet.'); setMeter(); return; }
-    arr.forEach(renderCard);
-    st.shown = arr.length; st.pool = arr; setMeter();
-    note('Opened liked view.');
-  }
-
-  /*** LOG MODAL ***/
-  function showLog(){ modal.classList.add('open'); note('Opened troubleshoot.'); }
-
-  /*** Icons ***/
-  function starSVG(){ return `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.7l2.5 5.07 5.6.82-4.05 3.95.96 5.58L12 16.9 6.99 19.1l.96-5.58L3.9 9.59l5.6-.82L12 3.7z"/></svg>`}
-  function downSVG(){ return `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3l-.46 2.3-.02.2a1.5 1.5 0 0 0 2.53 1.06L15.75 15H18a2 2 0 0 0 2-2V8a5 5 0 0 0-5-5z"/></svg>`}
-
-  /*** Kick off ***/
-  note('Ready. Tap New batch.');
-})();
 </script>
 </body>
 </html>
