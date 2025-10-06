@@ -1,201 +1,340 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Celeb Wall</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #1a1a1a;
-      color: #eee;
-      background-image: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
-    }
-    header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 10px;
-      background: #222;
-      border-bottom: 1px solid #333;
-    }
-    .pill {
-      display: inline-block;
-      padding: 8px 14px;
-      margin: 6px;
-      border-radius: 18px;
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none;
-      text-align: center;
-    }
-    .btn { background: #333; color: #eee; }
-    .btn.primary { background: #ff6f91; }
-    .btn.alt { background: #6fb1ff; }
-    .btn.mono { background: #444; }
-    .pill.meter { background: #2c2c2c; color: #bbb; }
-    .pill.tag { background: #555; }
-    .cards {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 20px auto;
-      max-width: 600px;
-    }
-    .card {
-      background: #262626;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      overflow: hidden;
-      margin: 12px 0;
-      width: 100%;
-    }
-    .card img {
-      width: 100%;
-      display: block;
-    }
-    .card-footer {
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .card-footer button {
-      border: none;
-      border-radius: 50%;
-      padding: 10px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .like { background: #ffcc00; }
-    .dislike { background: #444; color: #eee; }
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal .sheet {
-      background: #1f1f1f;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 90%;
-      max-height: 80%;
-      overflow-y: auto;
-    }
-    .modal .close {
-      float: right;
-      background: #ff6f91;
-      border: none;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .toast {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: #eee;
-      padding: 10px 20px;
-      border-radius: 6px;
-      display: none;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Celeb Wall • v6.3.1-stable</title>
+<style>
+  :root{
+    --bg:#0c0f13;           /* deep slate */
+    --panel:#12161c;        /* card bg */
+    --ink:#eaf0ff;          /* text on dark */
+    --muted:#9fb0c6;        /* secondary text */
+    --pill:#1b2330;         /* pill base */
+    --pill-ring:#2a3446;    /* outline */
+    --pink:#ff9db4;
+    --blue:#93b8ff;
+    --green:#87e7c3;
+    --warn:#ffd27d;
+    --err:#ff8d8d;
+    --radius:16px;
+    --shadow:0 10px 28px rgba(0,0,0,.35);
+  }
+  html,body{height:100%}
+  body{
+    margin:0;background:linear-gradient(180deg,#0a0d11 0%,#0c0f13 35%,#0e1217 100%);
+    color:var(--ink); font:500 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:18px 14px 80px}
+  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:0;background:linear-gradient(180deg,rgba(10,13,17,.95),rgba(10,13,17,.75));backdrop-filter:saturate(1.1) blur(10px);padding:14px 10px;z-index:20;border-bottom:1px solid rgba(255,255,255,.04)}
+  h1{margin:0 14px 0 0;font-size:22px;letter-spacing:.3px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .pill{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;background:var(--pill);border:1px solid var(--pill-ring);color:var(--ink);box-shadow:var(--shadow)}
+  .btn{cursor:pointer;user-select:none;transition:transform .06s ease, filter .15s ease}
+  .btn:active{transform:translateY(1px)}
+  .primary{background:var(--pink);color:#1c1115;border-color:#ffbcd0}
+  .alt{background:var(--blue);color:#0e1a37;border-color:#bcd1ff}
+  .mono{background:transparent}
+  .meter{background:transparent;border-style:dashed;color:var(--muted)}
+  .tag{background:#161b23;color:var(--muted)}
+  .cards{display:grid;grid-template-columns:1fr;gap:18px;margin:18px 0}
+  @media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+  .card{background:var(--panel);border:1px solid #1d2330;border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+  .media{width:100%;aspect-ratio:4/5;background:#0b0f14;display:grid;place-items:center}
+  .media img,.media video{width:100%;height:100%;object-fit:cover;display:block;background:#0b0f14}
+  .foot{display:flex;align-items:center;justify-content:space-between;padding:12px;border-top:1px solid rgba(255,255,255,.06)}
+  .sub{font-weight:700;background:#17202a;color:#a8c3ff;padding:8px 12px;border-radius:12px}
+  .actions{display:flex;gap:10px}
+  .star,.nope{width:48px;height:42px;border-radius:14px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.1)}
+  .star{background:var(--pink);color:#2a1220}
+  .nope{background:#222a35;color:#ffb0b0}
+  /* modal */
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:40}
+  .modal.show{display:flex}
+  .sheet{width:min(720px,92vw);background:var(--panel);border:1px solid #283141;border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+  .hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .close{background:var(--pink);border:1px solid #ffc1d2;color:#2a1018;border-radius:999px;padding:8px 14px;cursor:pointer}
+  pre#log{margin:0;padding:16px;max-height:60vh;overflow:auto;color:#e9f2ff;white-space:pre-wrap}
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1c2431;border:1px solid #2a3446;color:#eaf0ff;padding:12px 16px;border-radius:14px;box-shadow:var(--shadow);display:none;z-index:50}
+  .toast.show{display:block}
+  /* helper */
+  .muted{color:var(--muted)}
+  .spacer{flex:1}
+</style>
 </head>
 <body>
-  <header>
-    <div class="pill btn mono">Celeb Wall</div>
-    <div class="pill btn primary" id="btn-new">New batch</div>
-    <div class="pill btn alt" id="btn-load">Load more</div>
-    <div class="pill btn alt" id="btn-shuffle">Shuffle</div>
-    <div class="pill meter">Build v6.3</div>
-    <div class="pill meter">Shown <b id="shown">0</b></div>
-    <div class="pill meter">Pool <b id="pool">0</b></div>
-    <div class="pill btn mono" id="btn-troubleshoot">Troubleshoot</div>
-  </header>
+  <div class="wrap">
+    <header>
+      <h1>Celeb&nbsp;Wall</h1>
+      <div class="pill meter">NSFW enabled • people-only • <b>r/celebs</b></div>
+      <div class="spacer"></div>
+      <div id="build" class="pill meter">Build v6.3.1-stable</div>
+    </header>
 
-  <section id="cards" class="cards"></section>
+    <div class="row">
+      <div id="btnNew"   class="pill btn primary">New batch</div>
+      <div id="btnMore"  class="pill btn alt">Load more</div>
+      <div id="btnShuf"  class="pill btn alt">Shuffle</div>
+      <div id="shown"    class="pill meter">Shown <b>0</b></div>
+      <div id="pool"     class="pill meter">Pool <b>0</b></div>
+      <div id="btnTS"    class="pill btn mono">Troubleshoot</div>
+    </div>
+
+    <section id="cards" class="cards"></section>
+  </div>
 
   <!-- Troubleshoot modal -->
   <div class="modal" id="modal">
     <div class="sheet">
-      <button class="close" id="closeModal">Close</button>
-      <h3>Troubleshoot</h3>
+      <div class="hd">
+        <div class="pill tag">Troubleshoot</div>
+        <button class="close" id="close">Close</button>
+      </div>
       <pre id="log"></pre>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-  <script>
-    const cards = document.getElementById("cards");
-    const shownEl = document.getElementById("shown");
-    const poolEl = document.getElementById("pool");
-    const logEl = document.getElementById("log");
-    const toast = document.getElementById("toast");
+<script>
+(() => {
+  const BUILD = 'v6.3.1-stable';
+  const MAX_POOL = 20;            // how many posts we try to collect per batch
+  const BATCH_NAMES = 10;         // how many celeb names to query per batch
+  const POSTS_PER_NAME = 3;       // cap per name to keep variety
+  const RETRIES = 2;              // polite retry count
+  const DELAY = (ms)=>new Promise(r=>setTimeout(r,ms));
 
-    let pool = [], shown = 0;
+  // UI refs
+  const elCards = document.getElementById('cards');
+  const elShown = document.querySelector('#shown b');
+  const elPool  = document.querySelector('#pool b');
+  const elToast = document.getElementById('toast');
+  const elLog   = document.getElementById('log');
+  const modal   = document.getElementById('modal');
 
-    function showToast(msg) {
-      toast.innerText = msg;
-      toast.style.display = "block";
-      setTimeout(() => toast.style.display = "none", 2000);
+  // Buttons
+  document.getElementById('btnNew').onclick = newBatch;
+  document.getElementById('btnMore').onclick = loadMore;
+  document.getElementById('btnShuf').onclick = shuffleDeck;
+  document.getElementById('btnTS').onclick = () => { showLog(); };
+  document.getElementById('close').onclick = () => modal.classList.remove('show');
+
+  // State
+  let pool = [];     // queued posts not yet shown
+  let shown = 0;
+  let logLines = [];
+
+  function toast(msg, ms=2200){
+    elToast.textContent = msg;
+    elToast.classList.add('show');
+    setTimeout(()=>elToast.classList.remove('show'), ms);
+  }
+  function log(line){
+    const ts = new Date().toLocaleTimeString();
+    logLines.unshift(`[${ts}] ${line}`);
+    if (logLines.length>200) logLines.length = 200;
+  }
+  function showLog(){
+    elLog.textContent = `Build: ${BUILD}
+Pool size: ${pool.length}, shown: ${shown}
+` + logLines.join('\n');
+    modal.classList.add('show');
+  }
+
+  // Names (100). Slight “spicy” bias by positioning, but still general celebs.
+  const CELEBS = [
+    "Charli D'Amelio","Lea Elui","Kendall Jenner","Madison Beer","Hailey Bieber","Addison Rae","Sabrina Carpenter",
+    "Dua Lipa","Sydney Sweeney","Alexandra Daddario","Megan Fox","Emily Ratajkowski","Ariana Grande","Selena Gomez",
+    "Doja Cat","Camila Cabello","Zendaya","Anya Taylor-Joy","Ana de Armas","Kylie Jenner","Bella Hadid","Gigi Hadid",
+    "Rita Ora","Sofia Vergara","Maisie Williams","Emilia Clarke","Gal Gadot","Margot Robbie","Florence Pugh","Taylor Swift",
+    "Olivia Rodrigo","Kaia Gerber","Lily Collins","Josephine Skriver","Barbara Palvin","Candice Swanepoel","Rosie Huntington-Whiteley",
+    "Irina Shayk","Elsa Hosk","Adriana Lima","Cara Delevingne","Karlie Kloss","Jourdan Dunn","Miranda Kerr","Nina Agdal",
+    "Alexis Ren","Sommer Ray","Lana Del Rey","Becky G","Bebe Rexha","Halsey","Ava Max","Tinashe","Madelyn Cline","Rachel Cook",
+    "Victoria Justice","Vanessa Hudgens","Alycia Debnam-Carey","Keke Palmer","Chloë Grace Moretz","Emma Watson","Lily-Rose Depp",
+    "Hailee Steinfeld","Saoirse Ronan","Zoe Kravitz","Mila Kunis","Jennifer Lawrence","Scarlett Johansson","Elizabeth Olsen",
+    "Jenna Ortega","Jodie Comer","Anitta","Karol G","Becky Lynch","Addison Rae Easterling","Dixie D'Amelio","Noah Cyrus",
+    "Maia Mitchell","Camila Mendes","Madelaine Petsch","Lili Reinhart","Katherine Langford","Jenna Coleman","Phoebe Dynevor",
+    "Emma Mackey","Suki Waterhouse","Lucy Hale","Ashley Benson","Shay Mitchell","Victoria Beckham","Nathalie Emmanuel",
+    "Lourdes Leon","Kiernan Shipka","Katherine McNamara","Tiffany Alvord","Pia Mia","Alessandra Ambrosio","Jasmine Tookes",
+    "Taylor Hill","Martha Hunt","Sara Sampaio","Rachael Ostovich","Aimee Lou Wood","Ella Purnell","Lily James"
+  ];
+
+  // ------- Fetch (single, stable path) -------
+  // We use r.jina.ai as a simple CORS proxy to old.reddit JSON search.
+  // It returns the remote response body as text (including JSON), no CORS issues.
+  async function fetchCelebPosts(name){
+    const q = encodeURIComponent(name);
+    const redditURL = `http://old.reddit.com/r/celebs/search.json?q=${q}&restrict_sr=on&sort=new&t=month`;
+    const proxy = `https://r.jina.ai/http://old.reddit.com/r/celebs/search.json?q=${q}&restrict_sr=on&sort=new&t=month`;
+
+    for(let attempt=0; attempt<=RETRIES; attempt++){
+      try{
+        const t0 = performance.now();
+        const res = await fetch(proxy, {cache:'no-store'});
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const txt = await res.text();
+        // old.reddit json may come through as text; parse safely:
+        const data = JSON.parse(txt);
+        const children = (data?.data?.children||[]).map(c=>c.data);
+        log(`${name}: +${children.length} (${Math.round(performance.now()-t0)}ms)`);
+        return children;
+      }catch(err){
+        log(`${name}: Retry ${attempt+1}/${RETRIES} – ${err.message||err}`);
+        if(attempt<RETRIES) await DELAY(400+attempt*500);
+      }
+    }
+    log(`${name}: Load failed`);
+    return [];
+  }
+
+  function pickMedia(p){
+    // Prefer images & gifs that are easy to render without extra CORS hops.
+    // Handle i.redd.it, i.imgur, reddit gallery previews.
+    if(!p) return null;
+    // direct image
+    if(p.url && /\.(jpg|jpeg|png|webp)$/i.test(p.url)) return {type:'img', src:p.url, sub:p.subreddit, title:p.title||''};
+
+    // preview images
+    if(p.preview?.images?.length){
+      const img = p.preview.images[0];
+      const src = img?.source?.url?.replace(/&amp;/g,'&');
+      if(src) return {type:'img', src, sub:p.subreddit, title:p.title||''};
+    }
+    // reddit hosted gif/mp4
+    if(p.preview?.reddit_video_preview?.fallback_url){
+      return {type:'vid', src:p.preview.reddit_video_preview.fallback_url, sub:p.subreddit, title:p.title||''};
+    }
+    // v.redd.it proper
+    if(p.media?.reddit_video?.fallback_url){
+      return {type:'vid', src:p.media.reddit_video.fallback_url, sub:p.subreddit, title:p.title||''};
+    }
+    // imgur gifv → mp4
+    if(/imgur\.com\/.+\.gifv$/i.test(p.url)){
+      return {type:'vid', src:p.url.replace(/\.gifv$/i,'.mp4'), sub:p.subreddit, title:p.title||''};
+    }
+    // last resort: if URL is imgur without extension try .jpg
+    if(/imgur\.com\/[a-z0-9]+$/i.test(p.url)){
+      return {type:'img', src:p.url+'.jpg', sub:p.subreddit, title:p.title||''};
+    }
+    return null;
+  }
+
+  function cardEl(item){
+    const wrap = document.createElement('article');
+    wrap.className = 'card';
+    const media = document.createElement('div');
+    media.className = 'media';
+
+    if(item.type==='img'){
+      const img = new Image();
+      img.decoding='async';
+      img.loading='eager';
+      img.src = item.src;
+      img.onerror = () => { wrap.remove(); updateMeters(); log('Image failed'); };
+      media.appendChild(img);
+    }else{
+      const v = document.createElement('video');
+      v.src = item.src; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true;
+      v.onerror = () => { wrap.remove(); updateMeters(); log('Video failed'); };
+      media.appendChild(v);
     }
 
-    function makeCard(name, imgUrl) {
-      const card = document.createElement("div");
-      card.className = "card";
-      const img = document.createElement("img");
-      img.src = imgUrl || "https://via.placeholder.com/600x400?text=" + name;
-      const footer = document.createElement("div");
-      footer.className = "card-footer";
-      footer.innerHTML = `<span>${name}</span>`;
-      const like = document.createElement("button");
-      like.className = "like"; like.innerText = "★";
-      like.onclick = () => showToast("Liked " + name);
-      const dislike = document.createElement("button");
-      dislike.className = "dislike"; dislike.innerText = "👎";
-      dislike.onclick = () => showToast("Disliked " + name);
-      footer.appendChild(like);
-      footer.appendChild(dislike);
-      card.appendChild(img);
-      card.appendChild(footer);
-      return card;
+    const foot = document.createElement('div');
+    foot.className = 'foot';
+    const sub = document.createElement('div');
+    sub.className = 'sub'; sub.textContent = item.name || item.sub || 'r/celebs';
+    const acts = document.createElement('div');
+    acts.className = 'actions';
+    const like = document.createElement('button');
+    like.className = 'star'; like.title='Like ⭐'; like.textContent='⭐';
+    const nope = document.createElement('button');
+    nope.className = 'nope'; nope.title='Dismiss 👎'; nope.textContent='👎';
+    like.onclick = ()=>{ toast('Saved locally ⭐'); wrap.remove(); updateMeters(); };
+    nope.onclick = ()=>{ wrap.remove(); updateMeters(); };
+    acts.append(like,nope);
+    foot.append(sub,acts);
+
+    wrap.append(media,foot);
+    return wrap;
+  }
+
+  function updateMeters(){
+    elPool.textContent = pool.length;
+    elShown.textContent = shown;
+  }
+
+  function shuffleDeck(){
+    if(!pool.length){ toast('Nothing to shuffle'); return; }
+    for(let i=pool.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [pool[i],pool[j]] = [pool[j],pool[i]];
+    }
+    toast('Shuffled');
+  }
+
+  async function loadMore(){
+    if(!pool.length){ toast('No fresh posts. Tap New batch.'); return; }
+    const take = Math.min(6, pool.length);
+    for(let i=0;i<take;i++){
+      const it = pool.shift();
+      shown++;
+      elCards.appendChild(cardEl(it));
+    }
+    updateMeters();
+  }
+
+  async function newBatch(){
+    pool.length = 0; shown = 0; elCards.innerHTML = '';
+    updateMeters();
+    toast('Building…');
+
+    // take a slice from celeb list with slight “spicy” front-bias
+    const names = CELEBS.slice(0); // copy
+    // lightweight shuffle:
+    for(let i=names.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*Math.min(i+1, 12)); // bias to early names
+      [names[i],names[j]] = [names[j],names[i]];
+    }
+    const pick = names.slice(0,BATCH_NAMES);
+
+    let collected = [];
+    for(const name of pick){
+      const posts = await fetchCelebPosts(name);
+      const usable = [];
+      for(const p of posts){
+        const m = pickMedia(p);
+        if(m){
+          m.name = name;
+          usable.push(m);
+          if(usable.length>=POSTS_PER_NAME) break;
+        }
+      }
+      collected = collected.concat(usable);
+      if(collected.length >= MAX_POOL) break;
+      // polite pause between names
+      await DELAY(250);
     }
 
-    function loadBatch() {
-      cards.innerHTML = "";
-      pool = ["Selena Gomez","Vanessa Hudgens","Megan Fox","Ana de Armas","Dua Lipa"];
-      shown = 0;
-      poolEl.innerText = pool.length;
-      shownEl.innerText = 0;
-      pool.forEach(name => {
-        cards.appendChild(makeCard(name, ""));
-        shown++;
-      });
-      shownEl.innerText = shown;
+    if(!collected.length){
+      log('No usable media collected.');
+      toast('No fresh posts. Tap New batch again.');
+      updateMeters(); showLog(); return;
     }
 
-    document.getElementById("btn-new").onclick = loadBatch;
-    document.getElementById("btn-load").onclick = () => showToast("Load more tapped");
-    document.getElementById("btn-shuffle").onclick = () => showToast("Shuffle tapped");
+    // randomize final pool lightly for variety
+    collected.sort(()=>Math.random()-.5);
+    pool = collected.slice(0, MAX_POOL);
+    updateMeters();
+    log(`Pool ready: ${pool.length} items`);
+    loadMore();
+  }
 
-    document.getElementById("btn-troubleshoot").onclick = () => {
-      logEl.innerText = "Build v6.3\nShown: " + shown + "\nPool: " + pool.length;
-      document.getElementById("modal").style.display = "flex";
-    };
-    document.getElementById("closeModal").onclick = () => {
-      document.getElementById("modal").style.display = "none";
-    };
-  </script>
+  // initial
+  log(`Build ${BUILD} ready`);
+})();
+</script>
 </body>
 </html>
