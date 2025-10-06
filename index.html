@@ -2,339 +2,309 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Celeb Wall • v6.3.1-stable</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Celeb Wall — v6.3.2</title>
 <style>
   :root{
-    --bg:#0c0f13;           /* deep slate */
-    --panel:#12161c;        /* card bg */
-    --ink:#eaf0ff;          /* text on dark */
-    --muted:#9fb0c6;        /* secondary text */
-    --pill:#1b2330;         /* pill base */
-    --pill-ring:#2a3446;    /* outline */
-    --pink:#ff9db4;
-    --blue:#93b8ff;
-    --green:#87e7c3;
-    --warn:#ffd27d;
-    --err:#ff8d8d;
-    --radius:16px;
-    --shadow:0 10px 28px rgba(0,0,0,.35);
+    --bg:#0f1115;
+    --bg2:#12151b;
+    --card:#161a22;
+    --text:#e9edf1;
+    --muted:#a9b3c1;
+    --pill:#222836;
+    --pillEdge:#2b3344;
+    --pink:#ff9cb3;
+    --blue:#8bb6ff;
+    --yellow:#ffd76a;
+    --red:#ff8b8b;
+    --shadow: 0 10px 28px rgba(0,0,0,.35);
+    --r:14px;
   }
+  *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;background:linear-gradient(180deg,#0a0d11 0%,#0c0f13 35%,#0e1217 100%);
-    color:var(--ink); font:500 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto;
-    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background: radial-gradient(1200px 600px at 50% -200px, #1a202c 0%, #0f1115 60%), var(--bg);
+    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.4;
   }
-  .wrap{max-width:880px;margin:0 auto;padding:18px 14px 80px}
-  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:0;background:linear-gradient(180deg,rgba(10,13,17,.95),rgba(10,13,17,.75));backdrop-filter:saturate(1.1) blur(10px);padding:14px 10px;z-index:20;border-bottom:1px solid rgba(255,255,255,.04)}
-  h1{margin:0 14px 0 0;font-size:22px;letter-spacing:.3px}
-  .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-  .pill{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;background:var(--pill);border:1px solid var(--pill-ring);color:var(--ink);box-shadow:var(--shadow)}
-  .btn{cursor:pointer;user-select:none;transition:transform .06s ease, filter .15s ease}
+
+  /* Top control bar */
+  header{position:sticky; top:0; z-index:5; backdrop-filter:saturate(120%) blur(6px);}
+  .bar{
+    display:flex; flex-wrap:wrap; gap:.75rem; align-items:center;
+    padding:16px clamp(14px, 4vw, 28px);
+    background: linear-gradient(180deg, rgba(18,21,27,.82), rgba(18,21,27,.55) 70%, rgba(18,21,27,0));
+    border-bottom:1px solid #1f2430;
+  }
+  .pill{display:inline-flex; align-items:center; gap:.6rem; padding:.7rem 1rem; border-radius:999px; background:var(--pill); border:1px solid var(--pillEdge); color:var(--text)}
+  .btn{cursor:pointer; user-select:none; transition:.15s transform, .15s filter}
   .btn:active{transform:translateY(1px)}
-  .primary{background:var(--pink);color:#1c1115;border-color:#ffbcd0}
-  .alt{background:var(--blue);color:#0e1a37;border-color:#bcd1ff}
-  .mono{background:transparent}
-  .meter{background:transparent;border-style:dashed;color:var(--muted)}
-  .tag{background:#161b23;color:var(--muted)}
-  .cards{display:grid;grid-template-columns:1fr;gap:18px;margin:18px 0}
-  @media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
-  .card{background:var(--panel);border:1px solid #1d2330;border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
-  .media{width:100%;aspect-ratio:4/5;background:#0b0f14;display:grid;place-items:center}
-  .media img,.media video{width:100%;height:100%;object-fit:cover;display:block;background:#0b0f14}
-  .foot{display:flex;align-items:center;justify-content:space-between;padding:12px;border-top:1px solid rgba(255,255,255,.06)}
-  .sub{font-weight:700;background:#17202a;color:#a8c3ff;padding:8px 12px;border-radius:12px}
-  .actions{display:flex;gap:10px}
-  .star,.nope{width:48px;height:42px;border-radius:14px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.1)}
-  .star{background:var(--pink);color:#2a1220}
-  .nope{background:#222a35;color:#ffb0b0}
-  /* modal */
-  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:40}
-  .modal.show{display:flex}
-  .sheet{width:min(720px,92vw);background:var(--panel);border:1px solid #283141;border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
-  .hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
-  .close{background:var(--pink);border:1px solid #ffc1d2;color:#2a1018;border-radius:999px;padding:8px 14px;cursor:pointer}
-  pre#log{margin:0;padding:16px;max-height:60vh;overflow:auto;color:#e9f2ff;white-space:pre-wrap}
-  /* toast */
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1c2431;border:1px solid #2a3446;color:#eaf0ff;padding:12px 16px;border-radius:14px;box-shadow:var(--shadow);display:none;z-index:50}
+  .mono{font-weight:700; letter-spacing:.2px}
+  .primary{background:var(--pink); color:#1d2129; border-color:#f59bb0}
+  .alt{background:var(--blue); color:#0f141c; border-color:#a0c5ff}
+  .chip{background:#1a2130; color:var(--muted)}
+  .tag{background:#1a1f2a; color:#cfd6df}
+
+  /* Metrics group */
+  .row{display:flex; flex-wrap:wrap; gap:.75rem; align-items:center}
+
+  /* Cards */
+  main{padding:10px clamp(12px,4vw,28px) 64px}
+  .cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px}
+  .card{
+    background:var(--card); border:1px solid #1f2430; border-radius:18px; box-shadow:var(--shadow); overflow:hidden;
+    display:flex; flex-direction:column; min-height:260px;
+  }
+  .frame{position:relative; aspect-ratio: 4/5; background:#0c0f14; display:grid; place-items:center}
+  .frame img, .frame video{width:100%; height:100%; object-fit:cover; display:block}
+  .meta{display:flex; gap:.6rem; align-items:center; justify-content:space-between; padding:10px 12px; border-top:1px solid #1f2430; background:linear-gradient(180deg, #151925, #141821)}
+  .title{font-weight:700}
+  .source{font-size:.85rem; color:var(--muted)}
+  .actions{display:flex; gap:.5rem}
+  .iconbtn{
+    width:42px; height:42px; border-radius:12px; border:1px solid #263047; background:#1b2232; display:grid; place-items:center; cursor:pointer;
+  }
+  .iconbtn.fav{background:var(--yellow); border-color:#ffdf7e; color:#2b1f00}
+  .iconbtn.bad{background:#2a1920; border-color:#3a202a; color:#ffb1b1}
+
+  /* Modal */
+  .modal{position:fixed; inset:0; display:none; place-items:center; padding:24px; z-index:6; }
+  .modal.open{display:grid; background:rgba(6,8,12,.52)}
+  .sheet{width:min(800px, 92vw); background:var(--card); border:1px solid #242a36; border-radius:18px; box-shadow:var(--shadow)}
+  .hd{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #232a38}
+  .close{background:var(--pink); color:#1e2129; border:1px solid #f3a0b5; border-radius:999px; padding:.55rem 1rem; font-weight:700; cursor:pointer}
+  pre{margin:0; padding:16px; max-height:60vh; overflow:auto; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; color:#d7dde6; background:#12161f}
+
+  /* Toast */
+  .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#151b25; border:1px solid #253049; color:#e6ecf3; padding:.7rem 1rem; border-radius:12px; display:none; z-index:7}
   .toast.show{display:block}
-  /* helper */
-  .muted{color:var(--muted)}
-  .spacer{flex:1}
+
+  /* Small helpers */
+  .sp{opacity:.55}
+  .badge{background:#1a2130; border:1px solid #27314a; padding:.4rem .7rem; border-radius:999px}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Celeb&nbsp;Wall</h1>
-      <div class="pill meter">NSFW enabled • people-only • <b>r/celebs</b></div>
-      <div class="spacer"></div>
-      <div id="build" class="pill meter">Build v6.3.1-stable</div>
-    </header>
+
+<header>
+  <div class="bar">
+    <div class="row">
+      <div class="pill btn mono" id="btnHome">Celeb Wall</div>
+      <div class="pill btn primary" id="btnNew">New batch</div>
+    </div>
 
     <div class="row">
-      <div id="btnNew"   class="pill btn primary">New batch</div>
-      <div id="btnMore"  class="pill btn alt">Load more</div>
-      <div id="btnShuf"  class="pill btn alt">Shuffle</div>
-      <div id="shown"    class="pill meter">Shown <b>0</b></div>
-      <div id="pool"     class="pill meter">Pool <b>0</b></div>
-      <div id="btnTS"    class="pill btn mono">Troubleshoot</div>
+      <div class="pill btn alt" id="btnLoad">Load more</div>
+      <div class="pill btn alt" id="btnShuffle">Shuffle</div>
+      <div class="pill chip">Build v6.3.2</div>
     </div>
 
-    <section id="cards" class="cards"></section>
-  </div>
-
-  <!-- Troubleshoot modal -->
-  <div class="modal" id="modal">
-    <div class="sheet">
-      <div class="hd">
-        <div class="pill tag">Troubleshoot</div>
-        <button class="close" id="close">Close</button>
-      </div>
-      <pre id="log"></pre>
+    <div class="row">
+      <div class="pill chip">Shown <b id="shown">0</b></div>
+      <div class="pill chip">Pool <b id="pool">0</b></div>
+      <div class="pill btn tag" id="btnTrouble">Troubleshoot</div>
     </div>
   </div>
+</header>
 
-  <div class="toast" id="toast"></div>
+<main>
+  <section id="cards" class="cards"></section>
+</main>
+
+<!-- Troubleshoot modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="hd">
+      <div class="pill tag">Troubleshoot</div>
+      <button class="close" id="closeModal">Close</button>
+    </div>
+    <pre id="log"></pre>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved.</div>
 
 <script>
-(() => {
-  const BUILD = 'v6.3.1-stable';
-  const MAX_POOL = 20;            // how many posts we try to collect per batch
-  const BATCH_NAMES = 10;         // how many celeb names to query per batch
-  const POSTS_PER_NAME = 3;       // cap per name to keep variety
-  const RETRIES = 2;              // polite retry count
-  const DELAY = (ms)=>new Promise(r=>setTimeout(r,ms));
+/* ---------------------------
+   State
+---------------------------- */
+const cardsEl = document.getElementById('cards');
+const shownEl = document.getElementById('shown');
+const poolEl  = document.getElementById('pool');
+const logEl   = document.getElementById('log');
+const modal   = document.getElementById('modal');
+const toast   = document.getElementById('toast');
 
-  // UI refs
-  const elCards = document.getElementById('cards');
-  const elShown = document.querySelector('#shown b');
-  const elPool  = document.querySelector('#pool b');
-  const elToast = document.getElementById('toast');
-  const elLog   = document.getElementById('log');
-  const modal   = document.getElementById('modal');
+let pool = [];        // available items (unrendered)
+let shown = 0;        // rendered count (increment as we attach)
+const BATCH_PICK = 8; // how many to add per "Load more"
+const PEOPLE = [
+  // front-loaded few you asked for, then a broader set
+  "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Madison Beer",
+  "Sabrina Carpenter","Sydney Sweeney","Dua Lipa","Gal Gadot","Alexandra Daddario",
+  "Ana de Armas","Taylor Swift","Selena Gomez","Kaia Gerber","Vanessa Hudgens",
+  "Margot Robbie","Emily Ratajkowski","Irina Shayk","Emma Watson","Ariana Grande"
+];
 
-  // Buttons
-  document.getElementById('btnNew').onclick = newBatch;
-  document.getElementById('btnMore').onclick = loadMore;
-  document.getElementById('btnShuf').onclick = shuffleDeck;
-  document.getElementById('btnTS').onclick = () => { showLog(); };
-  document.getElementById('close').onclick = () => modal.classList.remove('show');
+/* ---------------------------
+   Logging / modal
+---------------------------- */
+function log(msg){
+  const t = new Date().toLocaleTimeString();
+  logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+}
+document.getElementById('btnTrouble').onclick = ()=> modal.classList.add('open');
+document.getElementById('closeModal').onclick = ()=> modal.classList.remove('open');
+modal.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
 
-  // State
-  let pool = [];     // queued posts not yet shown
-  let shown = 0;
-  let logLines = [];
+/* ---------------------------
+   Utility
+---------------------------- */
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+function shuffleArray(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function updateMeters(){ shownEl.textContent = shown; poolEl.textContent = pool.length; }
+function toastShow(text='Saved.'){ toast.textContent=text; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1200); }
 
-  function toast(msg, ms=2200){
-    elToast.textContent = msg;
-    elToast.classList.add('show');
-    setTimeout(()=>elToast.classList.remove('show'), ms);
+/* ---------------------------
+   Media helpers
+---------------------------- */
+function normalizeUrl(raw, rv){
+  if (!raw && !rv) return null;
+  // direct images / gifs
+  if (raw && /\.(jpg|jpeg|png|gif|webp)$/i.test(raw)) return raw;
+  if (raw && /\.gifv$/i.test(raw)) return raw.replace(/\.gifv$/i,'.mp4');
+  // reddit native video
+  if (rv && (rv.fallback_url || rv.hls_url)) return rv.fallback_url || rv.hls_url;
+  return null;
+}
+
+/* ---------------------------
+   Reddit loader (surgical + robust)
+---------------------------- */
+async function fetchCelebMedia(name, limit=25){
+  const url = `https://www.reddit.com/r/celebs/search.json?restrict_sr=1&sort=new&limit=${limit}&q=${encodeURIComponent(name)}`;
+  try{
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if(!res.ok){ log(`${name}: HTTP ${res.status}`); return 0; }
+    const data = await res.json();
+    const children = data?.data?.children ?? [];
+    let added = 0;
+
+    for(const c of children){
+      const d  = c?.data ?? {};
+      const rv = d?.secure_media?.reddit_video ?? null;
+      const finalUrl = normalizeUrl(d.url_overridden_by_dest || d.url, rv);
+      if(!finalUrl) continue;
+
+      pool.push({
+        title: d.title || name,
+        url: finalUrl,
+        kind: finalUrl.endsWith('.mp4') || finalUrl.includes('.mp4') || finalUrl.includes('m3u8') ? 'video' : 'image',
+        source: 'r/celebs',
+        by: d.author || '',
+        link: d.permalink ? `https://reddit.com${d.permalink}` : ''
+      });
+      added++;
+    }
+    if(added===0) log(`${name}: none with media`);
+    else log(`${name}: +${added}`);
+    return added;
+  }catch(err){
+    log(`${name}: error ${err?.message || err}`);
+    return 0;
   }
-  function log(line){
-    const ts = new Date().toLocaleTimeString();
-    logLines.unshift(`[${ts}] ${line}`);
-    if (logLines.length>200) logLines.length = 200;
+}
+
+async function fetchCelebMediaWithRetry(name, limit=25, retries=2){
+  let added = 0;
+  for(let i=0;i<=retries;i++){
+    added += await fetchCelebMedia(name, limit);
+    if(added>0) break;
+    if(i<retries){ log(`${name}: retry ${i+1}/${retries}`); await sleep(600); }
   }
-  function showLog(){
-    elLog.textContent = `Build: ${BUILD}
-Pool size: ${pool.length}, shown: ${shown}
-` + logLines.join('\n');
-    modal.classList.add('show');
-  }
+  return added;
+}
 
-  // Names (100). Slight “spicy” bias by positioning, but still general celebs.
-  const CELEBS = [
-    "Charli D'Amelio","Lea Elui","Kendall Jenner","Madison Beer","Hailey Bieber","Addison Rae","Sabrina Carpenter",
-    "Dua Lipa","Sydney Sweeney","Alexandra Daddario","Megan Fox","Emily Ratajkowski","Ariana Grande","Selena Gomez",
-    "Doja Cat","Camila Cabello","Zendaya","Anya Taylor-Joy","Ana de Armas","Kylie Jenner","Bella Hadid","Gigi Hadid",
-    "Rita Ora","Sofia Vergara","Maisie Williams","Emilia Clarke","Gal Gadot","Margot Robbie","Florence Pugh","Taylor Swift",
-    "Olivia Rodrigo","Kaia Gerber","Lily Collins","Josephine Skriver","Barbara Palvin","Candice Swanepoel","Rosie Huntington-Whiteley",
-    "Irina Shayk","Elsa Hosk","Adriana Lima","Cara Delevingne","Karlie Kloss","Jourdan Dunn","Miranda Kerr","Nina Agdal",
-    "Alexis Ren","Sommer Ray","Lana Del Rey","Becky G","Bebe Rexha","Halsey","Ava Max","Tinashe","Madelyn Cline","Rachel Cook",
-    "Victoria Justice","Vanessa Hudgens","Alycia Debnam-Carey","Keke Palmer","Chloë Grace Moretz","Emma Watson","Lily-Rose Depp",
-    "Hailee Steinfeld","Saoirse Ronan","Zoe Kravitz","Mila Kunis","Jennifer Lawrence","Scarlett Johansson","Elizabeth Olsen",
-    "Jenna Ortega","Jodie Comer","Anitta","Karol G","Becky Lynch","Addison Rae Easterling","Dixie D'Amelio","Noah Cyrus",
-    "Maia Mitchell","Camila Mendes","Madelaine Petsch","Lili Reinhart","Katherine Langford","Jenna Coleman","Phoebe Dynevor",
-    "Emma Mackey","Suki Waterhouse","Lucy Hale","Ashley Benson","Shay Mitchell","Victoria Beckham","Nathalie Emmanuel",
-    "Lourdes Leon","Kiernan Shipka","Katherine McNamara","Tiffany Alvord","Pia Mia","Alessandra Ambrosio","Jasmine Tookes",
-    "Taylor Hill","Martha Hunt","Sara Sampaio","Rachael Ostovich","Aimee Lou Wood","Ella Purnell","Lily James"
-  ];
+/* ---------------------------
+   Rendering
+---------------------------- */
+function renderOne(item){
+  const card = document.createElement('article');
+  card.className = 'card';
 
-  // ------- Fetch (single, stable path) -------
-  // We use r.jina.ai as a simple CORS proxy to old.reddit JSON search.
-  // It returns the remote response body as text (including JSON), no CORS issues.
-  async function fetchCelebPosts(name){
-    const q = encodeURIComponent(name);
-    const redditURL = `http://old.reddit.com/r/celebs/search.json?q=${q}&restrict_sr=on&sort=new&t=month`;
-    const proxy = `https://r.jina.ai/http://old.reddit.com/r/celebs/search.json?q=${q}&restrict_sr=on&sort=new&t=month`;
+  const frame = document.createElement('div');
+  frame.className = 'frame';
 
-    for(let attempt=0; attempt<=RETRIES; attempt++){
-      try{
-        const t0 = performance.now();
-        const res = await fetch(proxy, {cache:'no-store'});
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const txt = await res.text();
-        // old.reddit json may come through as text; parse safely:
-        const data = JSON.parse(txt);
-        const children = (data?.data?.children||[]).map(c=>c.data);
-        log(`${name}: +${children.length} (${Math.round(performance.now()-t0)}ms)`);
-        return children;
-      }catch(err){
-        log(`${name}: Retry ${attempt+1}/${RETRIES} – ${err.message||err}`);
-        if(attempt<RETRIES) await DELAY(400+attempt*500);
-      }
-    }
-    log(`${name}: Load failed`);
-    return [];
-  }
-
-  function pickMedia(p){
-    // Prefer images & gifs that are easy to render without extra CORS hops.
-    // Handle i.redd.it, i.imgur, reddit gallery previews.
-    if(!p) return null;
-    // direct image
-    if(p.url && /\.(jpg|jpeg|png|webp)$/i.test(p.url)) return {type:'img', src:p.url, sub:p.subreddit, title:p.title||''};
-
-    // preview images
-    if(p.preview?.images?.length){
-      const img = p.preview.images[0];
-      const src = img?.source?.url?.replace(/&amp;/g,'&');
-      if(src) return {type:'img', src, sub:p.subreddit, title:p.title||''};
-    }
-    // reddit hosted gif/mp4
-    if(p.preview?.reddit_video_preview?.fallback_url){
-      return {type:'vid', src:p.preview.reddit_video_preview.fallback_url, sub:p.subreddit, title:p.title||''};
-    }
-    // v.redd.it proper
-    if(p.media?.reddit_video?.fallback_url){
-      return {type:'vid', src:p.media.reddit_video.fallback_url, sub:p.subreddit, title:p.title||''};
-    }
-    // imgur gifv → mp4
-    if(/imgur\.com\/.+\.gifv$/i.test(p.url)){
-      return {type:'vid', src:p.url.replace(/\.gifv$/i,'.mp4'), sub:p.subreddit, title:p.title||''};
-    }
-    // last resort: if URL is imgur without extension try .jpg
-    if(/imgur\.com\/[a-z0-9]+$/i.test(p.url)){
-      return {type:'img', src:p.url+'.jpg', sub:p.subreddit, title:p.title||''};
-    }
-    return null;
+  if(item.kind==='video'){
+    const v = document.createElement('video');
+    v.src = item.url; v.controls = true; v.muted = true; v.playsInline = true; v.loop = true; v.autoplay = true;
+    frame.appendChild(v);
+  }else{
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async'; img.alt = item.title;
+    img.src = item.url;
+    frame.appendChild(img);
   }
 
-  function cardEl(item){
-    const wrap = document.createElement('article');
-    wrap.className = 'card';
-    const media = document.createElement('div');
-    media.className = 'media';
+  const meta = document.createElement('div'); meta.className = 'meta';
 
-    if(item.type==='img'){
-      const img = new Image();
-      img.decoding='async';
-      img.loading='eager';
-      img.src = item.src;
-      img.onerror = () => { wrap.remove(); updateMeters(); log('Image failed'); };
-      media.appendChild(img);
-    }else{
-      const v = document.createElement('video');
-      v.src = item.src; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true;
-      v.onerror = () => { wrap.remove(); updateMeters(); log('Video failed'); };
-      media.appendChild(v);
-    }
+  const left = document.createElement('div');
+  const title = document.createElement('div'); title.className = 'title'; title.textContent = item.title.replace(/\s*\(.*?\)\s*/,'').slice(0,40);
+  const src = document.createElement('div'); src.className='source'; src.textContent = item.source;
+  left.appendChild(title); left.appendChild(src);
 
-    const foot = document.createElement('div');
-    foot.className = 'foot';
-    const sub = document.createElement('div');
-    sub.className = 'sub'; sub.textContent = item.name || item.sub || 'r/celebs';
-    const acts = document.createElement('div');
-    acts.className = 'actions';
-    const like = document.createElement('button');
-    like.className = 'star'; like.title='Like ⭐'; like.textContent='⭐';
-    const nope = document.createElement('button');
-    nope.className = 'nope'; nope.title='Dismiss 👎'; nope.textContent='👎';
-    like.onclick = ()=>{ toast('Saved locally ⭐'); wrap.remove(); updateMeters(); };
-    nope.onclick = ()=>{ wrap.remove(); updateMeters(); };
-    acts.append(like,nope);
-    foot.append(sub,acts);
+  const actions = document.createElement('div'); actions.className='actions';
+  const like = document.createElement('button'); like.className = 'iconbtn fav'; like.innerHTML = '★';
+  like.onclick = ()=>{ try{ const ls=JSON.parse(localStorage.getItem('likes')||'[]'); ls.unshift(item); localStorage.setItem('likes', JSON.stringify(ls.slice(0,500))); toastShow('Saved ⭐'); }catch{} };
+  const nope = document.createElement('button'); nope.className='iconbtn bad'; nope.innerHTML='👎';
+  nope.onclick = ()=> card.remove();
 
-    wrap.append(media,foot);
-    return wrap;
+  actions.append(like, nope);
+  meta.append(left, actions);
+
+  card.append(frame, meta);
+  cardsEl.appendChild(card);
+  shown++; updateMeters();
+}
+
+function renderMore(n=BATCH_PICK){
+  if(pool.length===0){ log('No items in pool. Tap New batch.'); return; }
+  let c = 0;
+  while (c<n && pool.length){
+    const item = pool.shift();
+    renderOne(item);
+    c++;
   }
+}
 
-  function updateMeters(){
-    elPool.textContent = pool.length;
-    elShown.textContent = shown;
+/* ---------------------------
+   Orchestration
+---------------------------- */
+async function buildNewBatch(){
+  cardsEl.innerHTML = ''; shown = 0; pool = []; updateMeters(); logEl.textContent='';
+  log('Building…');
+  // Load a handful of names quickly (front chunk) then random few from the rest
+  const picks = [...PEOPLE.slice(0,8), ...shuffleArray(PEOPLE.slice(8)).slice(0,10)];
+  for(const name of picks){
+    await fetchCelebMediaWithRetry(name, 25, 1);
+    // brief spacing to reduce burstiness
+    await sleep(180);
   }
+  updateMeters();
+  if(pool.length===0) log('No media found. Try again.');
+  else { shuffleArray(pool); renderMore(); }
+}
 
-  function shuffleDeck(){
-    if(!pool.length){ toast('Nothing to shuffle'); return; }
-    for(let i=pool.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [pool[i],pool[j]] = [pool[j],pool[i]];
-    }
-    toast('Shuffled');
-  }
+/* ---------------------------
+   Handlers
+---------------------------- */
+document.getElementById('btnNew').onclick    = buildNewBatch;
+document.getElementById('btnLoad').onclick   = ()=> renderMore();
+document.getElementById('btnShuffle').onclick= ()=>{ shuffleArray(pool); log('Shuffled pool'); };
+document.getElementById('btnHome').onclick   = ()=>{ window.scrollTo({top:0,behavior:'smooth'}); };
 
-  async function loadMore(){
-    if(!pool.length){ toast('No fresh posts. Tap New batch.'); return; }
-    const take = Math.min(6, pool.length);
-    for(let i=0;i<take;i++){
-      const it = pool.shift();
-      shown++;
-      elCards.appendChild(cardEl(it));
-    }
-    updateMeters();
-  }
-
-  async function newBatch(){
-    pool.length = 0; shown = 0; elCards.innerHTML = '';
-    updateMeters();
-    toast('Building…');
-
-    // take a slice from celeb list with slight “spicy” front-bias
-    const names = CELEBS.slice(0); // copy
-    // lightweight shuffle:
-    for(let i=names.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*Math.min(i+1, 12)); // bias to early names
-      [names[i],names[j]] = [names[j],names[i]];
-    }
-    const pick = names.slice(0,BATCH_NAMES);
-
-    let collected = [];
-    for(const name of pick){
-      const posts = await fetchCelebPosts(name);
-      const usable = [];
-      for(const p of posts){
-        const m = pickMedia(p);
-        if(m){
-          m.name = name;
-          usable.push(m);
-          if(usable.length>=POSTS_PER_NAME) break;
-        }
-      }
-      collected = collected.concat(usable);
-      if(collected.length >= MAX_POOL) break;
-      // polite pause between names
-      await DELAY(250);
-    }
-
-    if(!collected.length){
-      log('No usable media collected.');
-      toast('No fresh posts. Tap New batch again.');
-      updateMeters(); showLog(); return;
-    }
-
-    // randomize final pool lightly for variety
-    collected.sort(()=>Math.random()-.5);
-    pool = collected.slice(0, MAX_POOL);
-    updateMeters();
-    log(`Pool ready: ${pool.length} items`);
-    loadMore();
-  }
-
-  // initial
-  log(`Build ${BUILD} ready`);
-})();
+/* First paint hint */
+updateMeters();
 </script>
 </body>
 </html>
