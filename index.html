@@ -1,52 +1,51 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Celeb Scroll — Build v6.3 (pastel + proxy)</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Celeb Scroll — Build v6.4</title>
 <style>
-  :root{
-    --bg:#f7f5f2; --ink:#2b2f36; --ink2:#606874; --card:#fff; --edge:#eae6e1;
-    --chip:#e2f0ff; --ok:#ffe07a; --bad:#ffb3a7;
-  }
+  :root{--bg:#f7f5f2;--ink:#2b2f36;--mut:#6b7280;--edge:#e9e3de;--card:#fff;--ok:#ffe07a;--bad:#ffb3a7;}
   html,body{height:100%;margin:0}
   body{
-    color:var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,Segoe UI,Roboto,Arial;
     background:
-      radial-gradient(1200px 600px at 50% -15%, #ffffff 0%, rgba(255,255,255,0) 55%),
-      radial-gradient(1000px 400px at 110% 10%, #fff6f8 0%, rgba(255,255,255,0) 60%),
-      radial-gradient(1000px 400px at -10% 0%, #f0fbff 0%, rgba(255,255,255,0) 60%),
-      radial-gradient(1px 1px at 30% 40%, rgba(0,0,0,.06) 0, rgba(0,0,0,0) 1px),
-      radial-gradient(1px 1px at 70% 20%, rgba(0,0,0,.05) 0, rgba(0,0,0,0) 1px),
-      radial-gradient(1px 1px at 20% 80%, rgba(0,0,0,.05) 0, rgba(0,0,0,0) 1px),
-      radial-gradient(1px 1px at 80% 70%, rgba(0,0,0,.04) 0, rgba(0,0,0,0) 1px),
-      var(--bg);
-    background-size: auto, auto, auto, 12px 12px, 10px 10px, 14px 14px, 11px 11px, auto;
+      radial-gradient(1000px 500px at 50% -10%,#fff 0,transparent 55%),
+      radial-gradient(1000px 400px at 110% 10%,#fff6f8 0,transparent 60%),
+      radial-gradient(1000px 400px at -10% 0,#f0fbff 0,transparent 60%),
+      radial-gradient(1px 1px at 30% 40%,rgba(0,0,0,.06) 0,transparent 1px),
+      radial-gradient(1px 1px at 70% 20%,rgba(0,0,0,.05) 0,transparent 1px),
+      radial-gradient(1px 1px at 20% 80%,rgba(0,0,0,.05) 0,transparent 1px),
+      radial-gradient(1px 1px at 80% 70%,rgba(0,0,0,.04) 0,transparent 1px),
+      #f7f5f2;
+    background-size:auto,auto,auto,12px 12px,10px 10px,14px 14px,11px 11px,auto;
   }
   .bar{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;justify-content:center;padding:18px 16px}
-  .badge{background:linear-gradient(180deg,#fff,#f7f7f7); border:1px solid var(--edge); padding:10px 14px;border-radius:14px;font-weight:800;box-shadow:0 6px 18px rgba(177,168,160,.25)}
-  .pill{background:linear-gradient(180deg,#ffffff,#f5f1ee); border:1px solid var(--edge); padding:12px 18px;border-radius:16px;font-weight:900; cursor:pointer; box-shadow:0 8px 22px rgba(180,170,160,.28); user-select:none}
-  .pill.rose{background:linear-gradient(180deg,#ffe6ec,#ffd8e2); border-color:#ffd2de}
-  .pill.blue{background:linear-gradient(180deg,#e4f4ff,#d8eeff); border-color:#d1eaff}
-  .pill.warn{background:linear-gradient(180deg,#fff3d6,#ffe8af); border-color:#ffe3a1}
-  .stat{font-weight:900; color:#7a8696}
+  .badge,.pill{background:linear-gradient(180deg,#fff,#f7f7f7);border:1px solid var(--edge);box-shadow:0 6px 18px rgba(177,168,160,.25)}
+  .badge{padding:10px 14px;border-radius:14px;font-weight:800}
+  .pill{padding:12px 18px;border-radius:16px;font-weight:900;cursor:pointer;user-select:none}
+  .pill.rose{background:linear-gradient(180deg,#ffe6ec,#ffd8e2);border-color:#ffd2de}
+  .pill.blue{background:linear-gradient(180deg,#e4f4ff,#d8eeff);border-color:#d1eaff}
+  .pill.warn{background:linear-gradient(180deg,#fff3d6,#ffe8af);border-color:#ffe3a1}
   .wrap{max-width:860px;margin:0 auto;padding:10px 14px}
   .grid{display:grid;gap:22px}
-  .card{background:linear-gradient(180deg,#ffffff,#faf8f6); border:1px solid var(--edge); border-radius:22px; overflow:hidden; box-shadow:0 26px 55px rgba(160,150,140,.20), 0 6px 18px rgba(160,150,140,.18)}
-  .mediaBox{position:relative;background:#fcfbf9;display:flex;justify-content:center;align-items:center;min-height:260px}
-  img,video{max-width:100%;height:auto;display:block}
-  video{background:#000; border-bottom:1px solid var(--edge)}
+  .card{background:linear-gradient(180deg,#ffffff,#faf8f6);border:1px solid var(--edge);border-radius:22px;overflow:hidden;
+        box-shadow:0 26px 55px rgba(160,150,140,.20),0 6px 18px rgba(160,150,140,.18)}
+  .media{position:relative;background:#fcfbf9;display:flex;justify-content:center;align-items:center;min-height:260px}
+  img,video{max-width:100%;display:block;height:auto}
+  video{background:#000;border-bottom:1px solid var(--edge)}
   .meta{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff}
-  .src{background:#e2f0ff; color:#2f4a66; border:1px solid #d2e5fb; padding:9px 12px; border-radius:12px;font-weight:800}
+  .src{background:#e2f0ff;color:#2f4a66;border:1px solid #d2e5fb;padding:9px 12px;border-radius:12px;font-weight:800}
   .actions{display:flex;gap:10px}
   .btn{border:0;padding:12px 18px;border-radius:14px;font-weight:900;cursor:pointer}
-  .like{background:var(--ok)}
-  .nope{background:var(--bad)}
-  .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px dashed var(--edge); background:#fff}
-  .small{color:var(--ink2);font-weight:700}
-  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2d3440;color:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .18s}
+  .like{background:var(--ok)} .nope{background:var(--bad)}
+  .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px dashed var(--edge);background:#fff}
+  .small{color:var(--mut);font-weight:700}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2d3440;color:#fff;border-radius:12px;
+         padding:12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .18s}
   .toast.show{opacity:1}
-  dialog{border:0;border-radius:18px;max-width:720px;width:calc(100% - 28px);background:#ffffff;padding:0;border:1px solid var(--edge);box-shadow:0 24px 60px rgba(0,0,0,.28)}
+  dialog{border:0;border-radius:18px;max-width:720px;width:calc(100% - 28px);background:#fff;padding:0;border:1px solid var(--edge);
+         box-shadow:0 24px 60px rgba(0,0,0,.28)}
   dialog::backdrop{background:rgba(0,0,0,.25)}
   .dgHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff7fb;border-bottom:1px solid #ffd7e6}
   .dgBody{padding:14px}
@@ -56,13 +55,13 @@
 <body>
   <div class="bar">
     <div class="badge">NSFW enabled • people-only</div>
-    <div class="badge">Build <strong id="build">v6.3</strong></div>
+    <div class="badge">Build <strong id="build">v6.4</strong></div>
   </div>
 
   <div class="bar">
     <button class="pill rose" id="newBatch">New batch</button>
     <button class="pill rose" id="loadMore">Load more</button>
-    <span class="pill">Shown <span id="shown" class="stat">0</span>/<span id="pool" class="stat">0</span></span>
+    <span class="pill">Shown <b id="shown">0</b>/<b id="pool">0</b></span>
     <button class="pill blue" id="shuffle">Shuffle 🔀</button>
     <button class="pill warn" id="trouble">Troubleshoot 🩺</button>
   </div>
@@ -71,15 +70,12 @@
   <div id="toast" class="toast"></div>
 
   <dialog id="diag">
-    <div class="dgHead">
-      <strong>Troubleshoot</strong>
-      <button class="pill rose" id="closeDiag">Close</button>
-    </div>
+    <div class="dgHead"><strong>Troubleshoot</strong><button class="pill rose" id="closeDiag">Close</button></div>
     <div class="dgBody"><code id="log">Starting…</code></div>
   </dialog>
 
 <script>
-/* ------------ Top names (front-weighted) ------------ */
+/* ===== Names (front-weighted) ===== */
 const TOP = [
  "Charli D'Amelio","Lea Elui","Kendall Jenner","Hailey Bieber","Madison Beer","Addison Rae","Sabrina Carpenter",
  "Sydney Sweeney","Dua Lipa","Alexandra Daddario","Ana de Armas","Emily Ratajkowski","Bella Hadid","Gigi Hadid",
@@ -96,57 +92,66 @@ const TOP = [
  "Tara Sutaria","Nora Fatehi","Mrunal Thakur","Sobhita Dhulipala","Tripti Dimri"
 ];
 
-/* ------------ State & utils ------------ */
-const state = { pool:[], shown:0, likes:[], log:[], building:false, proxy:"https://r.jina.ai/http/" };
-const $ = s => document.querySelector(s);
-const toast = msg => { const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); };
-const log = (...a)=>{ state.log.push(a.join(' ')); if($('#diag').open) $('#log').textContent = snapshot(); };
-const snapshot = ()=>[
+/* ===== State & helpers ===== */
+const S = { pool:[], shown:0, likes:[], log:[], building:false };
+const $=q=>document.querySelector(q);
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);};
+const log=(...a)=>{S.log.push(a.join(' ')); if($('#diag').open) $('#log').textContent=report();};
+const report=()=>[
   `Online: ${navigator.onLine}`,
   `UA: ${navigator.userAgent}`,
-  `Proxy: ${state.proxy}`,
-  `Pool size: ${state.pool.length}, shown: ${state.shown}, likes: ${state.likes.length}`,
-  `Last lines:`,
-  ...state.log.slice(-16)
+  `Pool size: ${S.pool.length}, shown: ${S.shown}, likes: ${S.likes.length}`,
+  'Last lines:',
+  ...S.log.slice(-18)
 ].join('\n');
-const setCounts = ()=>{ $('#shown').textContent=state.shown; $('#pool').textContent=state.pool.length; };
-const delay = ms=>new Promise(r=>setTimeout(r,ms));
+const setCounts=()=>{$('#shown').textContent=S.shown;$('#pool').textContent=S.pool.length;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* ------------ Robust fetch with retry ------------ */
-async function fetchWithRetry(url,{tries=3,timeout=9000,backoff=700}={}){
-  for(let i=1;i<=tries;i++){
-    try{
-      const ctrl=new AbortController(); const id=setTimeout(()=>ctrl.abort(),timeout);
-      const res=await fetch(url,{signal:ctrl.signal,cache:'no-store',headers:{'Accept':'application/json'}});
-      clearTimeout(id);
-      if(!res.ok) throw new Error(res.status);
-      return res;
-    }catch(e){
-      log(`Retry ${i}/${tries} ${url.split('?')[0]} — ${e}`);
-      if(i===tries) throw e;
-      await delay(backoff*i);
+/* ===== CORS-friendly fetch JSON with proxy rotation =====
+   Order:
+   1) AllOrigins RAW (returns raw body w/ CORS) – best for JSON
+   2) cors.isomorphic-git.org – simple pass-through
+   3) Direct (may fail on iOS)
+   4) Jina Reader (text) -> try JSON parse from text (fallback) */
+const proxers = [
+  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u=>`https://cors.isomorphic-git.org/${u}`,
+  u=>u,
+  u=>`https://r.jina.ai/http/${u.replace(/^https?:\/\//,'')}`
+];
+
+async function fetchJSON(url,{tries=3,timeout=9000}={}){
+  let lastErr=null;
+  for(const wrap of proxers){
+    const target = wrap(url);
+    for(let i=1;i<=tries;i++){
+      try{
+        const ctrl=new AbortController();const id=setTimeout(()=>ctrl.abort(),timeout);
+        const res=await fetch(target,{signal:ctrl.signal,cache:'no-store'});
+        clearTimeout(id);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        // Try json first, if it fails try text->json
+        try { return await res.json(); }
+        catch { const t=await res.text(); return JSON.parse(t); }
+      }catch(e){
+        lastErr=e; log(`Retry ${i}/${tries} ${target.split('?')[0]} — ${e}`);
+        if(i<tries) await sleep(600*i);
+      }
     }
   }
+  throw lastErr||new Error('All proxies failed');
 }
 
-/* ------------ Reddit helpers w/ proxy ------------ */
-/* r.jina.ai requires absolute URL w/o scheme or w/ http(s) — both ok. */
-const prox = absUrl => {
-  // Ensure absolute URL and normalize to http(s) after proxy prefix.
-  const clean = absUrl.replace(/^https?:\/\//,'');
-  return state.proxy + 'https://' + clean;
-};
-// Use old.reddit.com (lighter) + raw_json=1
-const R = (q) => prox(`https://old.reddit.com${q}${q.includes('?')?'&':'?'}raw_json=1`);
-
+/* ===== Reddit helpers ===== */
+const R = (q) => `https://old.reddit.com${q}${q.includes('?')?'&':'?'}raw_json=1`;
 async function searchCeleb(name){
-  const u1 = R(`/r/celebs/search.json?q=title:${encodeURIComponent(name)}&restrict_sr=1&sort=new&t=year&include_over_18=on&limit=12`);
-  const u2 = R(`/search.json?q=${encodeURIComponent(name+' site:i.redd.it')}&sort=new&limit=12&include_over_18=on`);
-  const u3 = R(`/r/celebs/new.json?limit=25&include_over_18=on`);
+  const u1=R(`/r/celebs/search.json?q=title:${encodeURIComponent(name)}&restrict_sr=1&sort=new&t=year&include_over_18=on&limit=12`);
+  const u2=R(`/search.json?q=${encodeURIComponent(name+' site:i.redd.it')}&sort=new&limit=12&include_over_18=on`);
+  const u3=R(`/r/celebs/new.json?limit=25&include_over_18=on`);
   for(const u of [u1,u2,u3]){
     try{
-      const j = await (await fetchWithRetry(u)).json();
-      const posts = (j.data?.children||[]).map(c=>c.data);
+      const j=await fetchJSON(u);
+      const posts=(j.data?.children||[]).map(c=>c.data);
       if(posts.length) return posts;
     }catch(e){}
   }
@@ -157,84 +162,77 @@ function pickMedia(p){
   const pv=p.preview?.images?.[0];
   const gif=pv?.variants?.gif?.source?.url?.replaceAll('&amp;','&');
   const src=pv?.source?.url?.replaceAll('&amp;','&');
-  const ov=p.url_overridden_by_dest?.replaceAll('&amp;','&');
-  let url=gif||src||ov||'';
-  let kind='img';
-  if(/\.gifv$/.test(url)){ url=url.replace(/\.gifv$/,'\.mp4'); kind='vid'; }
-  if(/\.mp4$|\.webm$/.test(url)) kind='vid';
+  const ov =p.url_overridden_by_dest?.replaceAll('&amp;','&');
+  let url=gif||src||ov||''; let kind='img';
+  if(/\.gifv$/i.test(url)){ url=url.replace(/\.gifv$/i,'.mp4'); kind='vid'; }
+  if(/\.mp4$|\.webm$/i.test(url)) kind='vid';
   if(/redgifs|gfycat/i.test(url)) return null;
   if(!/i\.redd\.it|i\.imgur\.com|\.gif$|\.jpg$|\.png$|\.mp4$|\.webm$/i.test(url)) return null;
   return {url,kind};
 }
 
-/* ------------ Build + render ------------ */
+/* ===== Build & render ===== */
 async function buildBatch(){
-  if(state.building) return;
-  state.building=true; state.pool=[]; state.shown=0; $('#list').innerHTML=''; setCounts();
+  if(S.building) return;
+  S.building=true; S.pool=[]; S.shown=0; $('#list').innerHTML=''; setCounts();
   log('Building new batch…');
 
   const names=[...TOP];
   for(let i=names.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [names[i],names[j]]=[names[j],names[i]]; }
   const targets=names.slice(0,40);
 
-  const q=[...targets];
+  const todo=[...targets];
   const workers=Array.from({length:4},async ()=>{
-    while(q.length){
-      const name=q.shift();
+    while(todo.length){
+      const name=todo.shift();
       try{
         const posts=await searchCeleb(name);
         let pick=null;
         for(const p of posts){ const m=pickMedia(p); if(m){ pick={name,sub:p.subreddit_name_prefixed||'r/celebs',src:m.url,kind:m.kind}; break; } }
-        if(pick){ state.pool.push(pick); setCounts(); log(`${name}: +1`); }
+        if(pick){ S.pool.push(pick); setCounts(); log(`${name}: +1`); }
         else    { log(`${name}: no media`); }
       }catch(e){ log(`${name}: Load failed`); }
     }
   });
   await Promise.all(workers);
-  state.building=false;
+  S.building=false;
 
-  if(!state.pool.length) toast('No fresh posts. Tap New batch again.');
-  else toast(`Ready — ${state.pool.length} items`);
+  if(!S.pool.length) toast('No fresh posts. Tap New batch again.');
+  else toast(`Ready — ${S.pool.length} items`);
   setCounts();
 }
 
 function renderNext(n=4){
   const frag=document.createDocumentFragment();
   for(let i=0;i<n;i++){
-    const item=state.pool[state.shown++]; if(!item) break;
+    const it=S.pool[S.shown++]; if(!it) break;
     const card=document.createElement('div'); card.className='card';
-
-    const media=document.createElement('div'); media.className='mediaBox';
-    if(item.kind==='vid'){ const v=document.createElement('video'); v.src=item.src; v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true; media.appendChild(v); }
-    else { const im=new Image(); im.loading='eager'; im.decoding='async'; im.src=item.src; media.appendChild(im); }
-
+    const media=document.createElement('div'); media.className='media';
+    if(it.kind==='vid'){ const v=document.createElement('video'); v.src=it.src; v.autoplay=v.muted=v.playsInline=v.loop=true; media.appendChild(v); }
+    else { const im=new Image(); im.loading='eager'; im.decoding='async'; im.src=it.src; media.appendChild(im); }
     const meta=document.createElement('div'); meta.className='meta';
-    const left=document.createElement('div'); left.innerHTML=`<span class="src">${item.name}</span>`;
+    const left=document.createElement('div'); left.innerHTML=`<span class="src">${it.name}</span>`;
     const actions=document.createElement('div'); actions.className='actions';
     const like=document.createElement('button'); like.className='btn like'; like.textContent='⭐';
     const nope=document.createElement('button'); nope.className='btn nope'; nope.textContent='👎';
-    like.onclick=()=>{ state.likes.push(item); toast('Saved ⭐'); card.remove(); };
+    like.onclick=()=>{ S.likes.push(it); toast('Saved ⭐'); card.remove(); };
     nope.onclick=()=>card.remove();
     actions.append(like,nope); meta.append(left,actions);
-
     const foot=document.createElement('div'); foot.className='foot';
-    foot.innerHTML=`<span class="small">Source: Reddit</span><span class="src">${item.sub}</span>`;
-
-    card.append(media,meta,foot);
-    frag.append(card);
+    foot.innerHTML=`<span class="small">Source: Reddit</span><span class="src">${it.sub}</span>`;
+    card.append(media,meta,foot); frag.append(card);
   }
-  $('#list').append(frag);
-  setCounts();
+  $('#list').append(frag); setCounts();
 }
 
-/* ------------ Controls ------------ */
+/* ===== Controls ===== */
 $('#newBatch').onclick=()=>buildBatch();
 $('#loadMore').onclick=()=>renderNext(4);
-$('#shuffle').onclick=()=>{ state.pool.sort(()=>Math.random()-.5); toast('Shuffled'); };
-$('#trouble').onclick=()=>{ $('#log').textContent=snapshot(); $('#diag').showModal(); };
+$('#shuffle').onclick=()=>{ S.pool.sort(()=>Math.random()-.5); toast('Shuffled'); };
+$('#trouble').onclick=()=>{ $('#log').textContent=report(); $('#diag').showModal(); };
 $('#closeDiag').onclick=()=>$('#diag').close();
 
-/* ------------ Init ------------ */
+/* ===== Boot ===== */
 buildBatch().then(()=>renderNext(6));
 </script>
 </body>
