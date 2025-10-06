@@ -1,124 +1,201 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Celeb Wall • v6.4</title>
-<style>
-  :root{
-    --bg:#0e1116;
-    --panel:#151922;
-    --card:#1a2030;
-    --ink:#e9eef6;
-    --ink-dim:#aab4c4;
-    --pill:#2a3144;
-    --accent:#ff8fb1;   /* pink */
-    --accent-2:#8fb4ff; /* baby blue */
-    --accent-3:#b6f2c9; /* mint */
-    --warn:#ffcc7a;
-    --radius:18px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    background: radial-gradient(1200px 800px at 10% -10%, #1a2030 0%, transparent 60%),
-                radial-gradient(1000px 600px at 110% -20%, #1b2333 0%, transparent 55%),
-                var(--bg);
-    color:var(--ink);
-    font:400 16px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
-  .wrap{max-width:900px;margin:20px auto;padding:12px}
-  .row{display:flex;flex-wrap:wrap;gap:12px}
-  .pill{
-    background:var(--pill);
-    border:1px solid #273047;
-    color:var(--ink);
-    padding:14px 18px;border-radius:999px;
-    display:inline-flex;align-items:center;gap:10px;
-    box-shadow:0 8px 20px rgba(0,0,0,.25) inset, 0 1px 0 rgba(255,255,255,.03);
-    user-select:none
-  }
-  .btn{cursor:pointer;transition:.2s transform,.2s filter}
-  .btn:active{transform:translateY(1px)}
-  .btn.primary{background:var(--accent);color:#1b1220;border:0}
-  .btn.alt{background:var(--accent-2);color:#0c1222;border:0}
-  .btn.mono{background:var(--pill)}
-  .meter{min-width:84px;justify-content:center}
-  .tag{background:#0f1320;border:1px dashed #2a3550;color:var(--ink-dim)}
-  .badge{padding:.25rem .6rem;border-radius:999px;background:#0e1322;border:1px solid #24304c;color:var(--ink-dim);font-size:.9rem}
-  header{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-  .flags{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
-  @media(min-width:600px){.cards{grid-template-columns:1fr 1fr}}
-  .card{
-    border-radius:var(--radius);
-    background:linear-gradient(180deg, #1b2130, #141a26 120%);
-    border:1px solid #26304a;
-    overflow:hidden; position:relative;
-    box-shadow:0 8px 30px rgba(0,0,0,.45);
-  }
-  .mediaWrap{position:relative; background:#0b0f18}
-  .mediaWrap img,.mediaWrap video{display:block;width:100%;height:auto;max-height:68vh;object-fit:cover}
-  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:rgba(12,16,25,.6);backdrop-filter:blur(6px)}
-  .title{font-weight:700}
-  .actions{display:flex;gap:10px}
-  .act{
-    width:48px;height:48px;border-radius:12px;display:grid;place-items:center;
-    font-size:22px;cursor:pointer;border:0;transition:.2s transform;
-  }
-  .act:active{transform:scale(.97)}
-  .act.like{background:var(--accent)}
-  .act.nope{background:#2d3752;color:#ffd9e6}
-  .src{padding:10px 14px;color:var(--ink-dim);font-size:.9rem;border-top:1px solid #26304a;background:#0f1420}
-  /* modal */
-  .modal{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;padding:24px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:50}
-  .modal.open{display:flex}
-  .sheet{width:min(820px,92vw);background:#101723;border:1px solid #273047;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
-  .sheet .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid #23304a}
-  .sheet pre{margin:0;padding:16px;max-height:55vh;overflow:auto;background:#0b111b}
-  .close{background:var(--accent);border:0;border-radius:999px;padding:10px 14px;color:#1b1220;font-weight:700;cursor:pointer}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#0d1422;border:1px solid #2a3550;color:var(--ink);padding:10px 14px;border-radius:12px;display:none}
-  .toast.show{display:block}
-  .muted{color:var(--ink-dim)}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celeb Wall</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      background-image: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 10px;
+      background: #222;
+      border-bottom: 1px solid #333;
+    }
+    .pill {
+      display: inline-block;
+      padding: 8px 14px;
+      margin: 6px;
+      border-radius: 18px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+    }
+    .btn { background: #333; color: #eee; }
+    .btn.primary { background: #ff6f91; }
+    .btn.alt { background: #6fb1ff; }
+    .btn.mono { background: #444; }
+    .pill.meter { background: #2c2c2c; color: #bbb; }
+    .pill.tag { background: #555; }
+    .cards {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    .card {
+      background: #262626;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      overflow: hidden;
+      margin: 12px 0;
+      width: 100%;
+    }
+    .card img {
+      width: 100%;
+      display: block;
+    }
+    .card-footer {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-footer button {
+      border: none;
+      border-radius: 50%;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .like { background: #ffcc00; }
+    .dislike { background: #444; color: #eee; }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal .sheet {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 90%;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+    .modal .close {
+      float: right;
+      background: #ff6f91;
+      border: none;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .toast {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #eee;
+      padding: 10px 20px;
+      border-radius: 6px;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="row">
-    <div class="pill tag">NSFW enabled • people-only • <strong>r/celebs</strong></div>
-    <div class="pill badge">Build v6.4</div>
-    <div class="pill mono btn" id="btnLiked">⭐ Liked <span id="likedCount" class="badge" style="margin-left:8px">0</span></div>
-    <div class="pill mono btn" id="btnTrouble">🩺 Troubleshoot</div>
-  </header>
-
-  <div class="row">
-    <div class="pill btn mono" id="btnNew">New batch</div>
-    <div class="pill btn primary" id="btnMore">Load more</div>
-    <div class="pill btn alt" id="btnShuffle">Shuffle 🔀</div>
+  <header>
+    <div class="pill btn mono">Celeb Wall</div>
+    <div class="pill btn primary" id="btn-new">New batch</div>
+    <div class="pill btn alt" id="btn-load">Load more</div>
+    <div class="pill btn alt" id="btn-shuffle">Shuffle</div>
+    <div class="pill meter">Build v6.3</div>
     <div class="pill meter">Shown <b id="shown">0</b></div>
     <div class="pill meter">Pool <b id="pool">0</b></div>
-  </div>
+    <div class="pill btn mono" id="btn-troubleshoot">Troubleshoot</div>
+  </header>
 
   <section id="cards" class="cards"></section>
-</div>
 
-<!-- Troubleshoot modal -->
-<div class="modal" id="modal">
-  <div class="sheet">
-    <div class="hd">
-      <div class="pill tag">Troubleshoot</div>
-      <button class="close" id="closeModal">✕ Close</button>
+  <!-- Troubleshoot modal -->
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <button class="close" id="closeModal">Close</button>
+      <h3>Troubleshoot</h3>
+      <pre id="log"></pre>
     </div>
-    <pre id="log"></pre>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+  <div class="toast" id="toast"></div>
 
-<script>
-// same JS logic as last time: proxy fetch, shuffle, new batch, likes, close modal
-</script>
+  <script>
+    const cards = document.getElementById("cards");
+    const shownEl = document.getElementById("shown");
+    const poolEl = document.getElementById("pool");
+    const logEl = document.getElementById("log");
+    const toast = document.getElementById("toast");
+
+    let pool = [], shown = 0;
+
+    function showToast(msg) {
+      toast.innerText = msg;
+      toast.style.display = "block";
+      setTimeout(() => toast.style.display = "none", 2000);
+    }
+
+    function makeCard(name, imgUrl) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const img = document.createElement("img");
+      img.src = imgUrl || "https://via.placeholder.com/600x400?text=" + name;
+      const footer = document.createElement("div");
+      footer.className = "card-footer";
+      footer.innerHTML = `<span>${name}</span>`;
+      const like = document.createElement("button");
+      like.className = "like"; like.innerText = "★";
+      like.onclick = () => showToast("Liked " + name);
+      const dislike = document.createElement("button");
+      dislike.className = "dislike"; dislike.innerText = "👎";
+      dislike.onclick = () => showToast("Disliked " + name);
+      footer.appendChild(like);
+      footer.appendChild(dislike);
+      card.appendChild(img);
+      card.appendChild(footer);
+      return card;
+    }
+
+    function loadBatch() {
+      cards.innerHTML = "";
+      pool = ["Selena Gomez","Vanessa Hudgens","Megan Fox","Ana de Armas","Dua Lipa"];
+      shown = 0;
+      poolEl.innerText = pool.length;
+      shownEl.innerText = 0;
+      pool.forEach(name => {
+        cards.appendChild(makeCard(name, ""));
+        shown++;
+      });
+      shownEl.innerText = shown;
+    }
+
+    document.getElementById("btn-new").onclick = loadBatch;
+    document.getElementById("btn-load").onclick = () => showToast("Load more tapped");
+    document.getElementById("btn-shuffle").onclick = () => showToast("Shuffle tapped");
+
+    document.getElementById("btn-troubleshoot").onclick = () => {
+      logEl.innerText = "Build v6.3\nShown: " + shown + "\nPool: " + pool.length;
+      document.getElementById("modal").style.display = "flex";
+    };
+    document.getElementById("closeModal").onclick = () => {
+      document.getElementById("modal").style.display = "none";
+    };
+  </script>
 </body>
 </html>
